@@ -18,6 +18,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1.0] - 2025-01-25
 
+### 🎯 **베타 버전 릴리스 - 초기 기반 모델**
+
+**릴리스 타입**: 베타 버전 (Beta Release)  
+**프로젝트명**: AWEKERS SEO AI BLOG APP  
+**버전**: v0.1.0 베타  
+**상태**: 초기 기반 모델 완성
+
 ### Added
 - 🚀 **초기 프로젝트 설정 완료**
   - Next.js 15.4.1 기반 프로젝트 구조

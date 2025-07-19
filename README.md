@@ -1,18 +1,34 @@
-# Awekers - 현대적인 블로그 플랫폼
+# AWEKERS SEO AI BLOG APP
 
-[![Version](https://img.shields.io/badge/version-v0.1.0-blue.svg)](https://github.com/NOMADIX2030/awekers/releases/tag/v0.1.0)
+[![Version](https://img.shields.io/badge/version-v0.1.0--beta-blue.svg)](https://github.com/NOMADIX2030/awekers-seo-ai-blog-app/releases/tag/v0.1.0)
+[![Status](https://img.shields.io/badge/status-Beta-orange.svg)](https://github.com/NOMADIX2030/awekers-seo-ai-blog-app)
 [![Next.js](https://img.shields.io/badge/Next.js-15.4.1-black.svg)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-19.1.0-blue.svg)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue.svg)](https://www.typescriptlang.org/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-아커스 블로그 홈페이지 - Next.js 15 기반의 현대적인 블로그 플랫폼
+**AWEKERS SEO AI BLOG APP** - Next.js 15 기반의 AI 기반 SEO 최적화 블로그 플랫폼
 
-**현재 버전**: v0.1.0 (2025-01-25)
+**현재 버전**: v0.1.0 베타 (2025-01-25) - 초기 기반 모델
 
 ## 🚀 프로젝트 개요
 
-Awekers는 Next.js 15, React 19, TypeScript, Prisma를 활용한 현대적인 블로그 플랫폼입니다. SEO 최적화, 실시간 분석, AI 기반 콘텐츠 생성, 관리자 대시보드 등 다양한 기능을 제공합니다.
+**AWEKERS SEO AI BLOG APP**은 Next.js 15, React 19, TypeScript, Prisma를 활용한 AI 기반 SEO 최적화 블로그 플랫폼입니다.
+
+### 🎯 **베타 버전 특징**
+- **초기 기반 모델**: 핵심 기능 구현 완료
+- **AI 기반 콘텐츠 생성**: OpenAI API 연동
+- **SEO 최적화**: 자동 메타태그, 구조화된 데이터
+- **실시간 분석**: 방문자 추적 및 성과 분석
+- **관리자 시스템**: 통합 관리 대시보드
+
+### 🏗️ **아키텍처**
+- **프론트엔드**: Next.js 15 + React 19 + TypeScript
+- **백엔드**: Next.js API Routes + Prisma ORM
+- **데이터베이스**: MySQL (Vercel Postgres 호환)
+- **AI 서비스**: OpenAI GPT-4 API
+- **이미지 서비스**: Unsplash API
+- **분석**: Google Analytics + Vercel Analytics
 
 ## ✨ 주요 기능
 

@@ -53,6 +53,11 @@ esac
 
 echo -e "${GREEN}새 버전: ${NEW_VERSION}${NC}"
 
+# 베타 버전 표시
+if [[ "${NEW_VERSION}" == "0.1.0" ]]; then
+    echo -e "${YELLOW}베타 버전: AWEKERS SEO AI BLOG APP 초기 기반 모델${NC}"
+fi
+
 # 사용자 확인
 read -p "버전을 ${NEW_VERSION}로 업데이트하시겠습니까? (y/N): " -n 1 -r
 echo
