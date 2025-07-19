@@ -25,10 +25,20 @@ const BlogListClient: React.FC<BlogListClientProps> = ({ siteName = "블로그" 
   const [selectedTag, setSelectedTag] = useState("");
 
   useEffect(() => {
-    fetch("/api/blog")
-      .then((res) => res.json())
-      .then((data) => setBlogs(data))
-      .finally(() => setLoading(false));
+    // 블로그 데이터 로딩 (최적화)
+    const fetchBlogs = async () => {
+      try {
+        const res = await fetch("/api/blog");
+        const data = await res.json();
+        setBlogs(data);
+      } catch (error) {
+        console.error('블로그 데이터 로딩 실패:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBlogs();
   }, []);
 
   // 필터링된 블로그 리스트
@@ -43,7 +53,12 @@ const BlogListClient: React.FC<BlogListClientProps> = ({ siteName = "블로그" 
       {/* 태그 필터 바 */}
       <TagFilterBar selectedTag={selectedTag} onTagSelect={setSelectedTag} />
       {loading ? (
-        <div className="text-center text-black/50 py-20">불러오는 중...</div>
+        <div className="text-center text-black/50 py-20">
+          <div className="animate-pulse">
+            <div className="h-4 bg-gray-200 rounded w-1/4 mx-auto mb-4"></div>
+            <div className="h-4 bg-gray-200 rounded w-1/2 mx-auto"></div>
+          </div>
+        </div>
       ) : filteredBlogs.length === 0 ? (
         <div className="text-center text-black/50 py-20">해당 태그의 블로그가 없습니다.</div>
       ) : (
