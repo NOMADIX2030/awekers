@@ -1,6 +1,14 @@
 # Awekers - 현대적인 블로그 플랫폼
 
+[![Version](https://img.shields.io/badge/version-v0.1.0-blue.svg)](https://github.com/NOMADIX2030/awekers/releases/tag/v0.1.0)
+[![Next.js](https://img.shields.io/badge/Next.js-15.4.1-black.svg)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19.1.0-blue.svg)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue.svg)](https://www.typescriptlang.org/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+
 아커스 블로그 홈페이지 - Next.js 15 기반의 현대적인 블로그 플랫폼
+
+**현재 버전**: v0.1.0 (2025-01-25)
 
 ## 🚀 프로젝트 개요
 

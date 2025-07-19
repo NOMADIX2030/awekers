@@ -7,7 +7,10 @@
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
-    "github:upload": "./scripts/github-upload.sh"
+    "github:upload": "./scripts/github-upload.sh",
+    "version:patch": "./scripts/version.sh patch",
+    "version:minor": "./scripts/version.sh minor",
+    "version:major": "./scripts/version.sh major"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
