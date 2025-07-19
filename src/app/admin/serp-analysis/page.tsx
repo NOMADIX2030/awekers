@@ -2,8 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import AdminLayout from '../components/AdminLayout';
-import AdminCard from '../components/AdminCard';
-import { StatCard } from '../components/AdminCard';
 import SERPTrafficChart from './components/SERPTrafficChart';
 import TrafficSourceChart from './components/TrafficSourceChart';
 import KeywordAnalysis from './components/KeywordAnalysis';

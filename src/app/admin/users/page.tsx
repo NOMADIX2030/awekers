@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import AdminCard from '../components/AdminCard';
+
 
 interface User {
   id: number;
@@ -42,7 +42,24 @@ const AdminUsersPage: React.FC = () => {
   const [filterRole, setFilterRole] = useState<'all' | 'admin' | 'user'>('all');
 
   useEffect(() => {
-    fetchUsers();
+    const loadUsers = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch('/api/admin/users');
+        if (response.ok) {
+          const data = await response.json();
+          setUsers(data.users || []);
+        } else {
+          showMessage('사용자 목록을 불러오는데 실패했습니다.', 'error');
+        }
+      } catch (error) {
+        console.error('사용자 목록 로드 오류:', error);
+        showMessage('사용자 목록을 불러오는데 실패했습니다.', 'error');
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadUsers();
   }, []);
 
   // 사용자 목록 조회

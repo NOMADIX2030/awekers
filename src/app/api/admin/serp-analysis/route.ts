@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '../../../../lib/prisma';
-import { getTrafficData, getTrafficSources, getPagePerformance, getSearchKeywords } from '../../../../lib/google-analytics';
+
 
 export async function GET(request: NextRequest) {
   try {

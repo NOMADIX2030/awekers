@@ -5,11 +5,6 @@ import Link from "next/link";
 import AdminLayout from "../components/AdminLayout";
 import AdminCard, { StatCard } from "../components/AdminCard";
 import AdminGrid, { AdminSection } from "../components/AdminGrid";
-import VisitorStats from "../components/VisitorStats";
-import BlogViewsChart from "../components/BlogViewsChart";
-import HomepageInfo from "../components/HomepageInfo";
-import AdvancedVisitorStats from "../components/AdvancedVisitorStats";
-import ServerInfo from "../components/ServerInfo";
 
 // 최근 게시글/댓글 아이템 컴포넌트
 const RecentItem: React.FC<{
@@ -319,8 +314,6 @@ const AdminDashboardPage: React.FC = () => {
         </div>
       </AdminSection>
 
-      {/* 서버리스 환경 정보 */}
-      <ServerInfo />
     </AdminLayout>
   );
 };

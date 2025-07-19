@@ -167,6 +167,7 @@ const BlogDetailPage: React.FC = () => {
 
   // 공유하기
   const handleShare = async () => {
+    if (!blog) return;
     const url = typeof window !== "undefined" ? window.location.href : "";
     if (navigator.share) {
       try {
@@ -213,6 +214,7 @@ const BlogDetailPage: React.FC = () => {
   const [copying, setCopying] = useState(false);
   const [copyMsg, setCopyMsg] = useState("");
   const handleCopy = async () => {
+    if (!blog) return;
     setCopying(true);
     setCopyMsg("");
     try {
@@ -247,13 +249,7 @@ const BlogDetailPage: React.FC = () => {
     }
   }, []);
 
-  // baseUrl 상태 관리 (window.location.origin)
-  const [baseUrl, setBaseUrl] = useState("");
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      setBaseUrl(window.location.origin);
-    }
-  }, []);
+
 
   // 댓글 상태
   const [comments, setComments] = useState<Array<{
@@ -570,7 +566,7 @@ const BlogDetailPage: React.FC = () => {
               <p className="text-base text-black/70 whitespace-pre-line mb-4">{blog.summary}</p>
               <div
                 className="text-sm text-black/90 whitespace-pre-line leading-relaxed"
-                dangerouslySetInnerHTML={{ __html: autoLinkKeywords(blog.content, blog.tag, baseUrl) }}
+                dangerouslySetInnerHTML={{ __html: autoLinkKeywords(blog.content, blog.tag, typeof window !== "undefined" ? window.location.origin : "") }}
               />
             </>
           )}
@@ -695,7 +691,7 @@ const BlogDetailPage: React.FC = () => {
                           <span className="font-semibold text-black text-sm">
                             {c.user.email.split('@')[0]}
                           </span>
-                          {c.user.isAdmin && (
+                          {(c.user as any).isAdmin && (
                             <span className="bg-black text-white px-2 py-0.5 rounded-full text-xs font-medium">
                               관리자
                             </span>
@@ -776,7 +772,7 @@ const BlogDetailPage: React.FC = () => {
                           {reportStates[c.id] ? '신고됨' : '신고'}
                         </button>
                         {/* 삭제 버튼 - 자신의 댓글이거나 관리자인 경우만 표시 */}
-                        {(c.user.id === userId || isAdmin) && (
+                        {((c.user as any).id === userId || isAdmin) && (
                           <button 
                             onClick={() => handleCommentDelete(c.id)}
                             disabled={deletingCommentId === c.id}
