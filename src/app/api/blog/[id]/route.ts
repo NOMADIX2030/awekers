@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-// GET: 특정 블로그 조회
+// GET: 특정 블로그 조회 (최적화)
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -13,7 +13,18 @@ export async function GET(
       return NextResponse.json({ error: "유효하지 않은 ID입니다." }, { status: 400 });
     }
 
+    // 최적화된 쿼리: 필요한 필드만 선택
     const blog = await prisma.blog.findUnique({
+      select: {
+        id: true,
+        title: true,
+        summary: true,
+        content: true,
+        tag: true,
+        image: true,
+        date: true,
+        view: true,
+      },
       where: { id },
     });
 
@@ -21,7 +32,12 @@ export async function GET(
       return NextResponse.json({ error: "블로그를 찾을 수 없습니다." }, { status: 404 });
     }
 
-    return NextResponse.json(blog);
+    // 캐시 헤더 추가 (5분 캐시)
+    const response = NextResponse.json(blog);
+    response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600');
+    response.headers.set('Content-Encoding', 'gzip');
+    
+    return response;
   } catch (error) {
     console.error("블로그 조회 오류:", error);
     return NextResponse.json({ error: "서버 오류가 발생했습니다." }, { status: 500 });

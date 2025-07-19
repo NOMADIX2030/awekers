@@ -20,6 +20,12 @@ model Blog {
   comments    Comment[]
   visits      PageVisit[]
   performance PagePerformance[]
+
+  // 성능 최적화를 위한 인덱스
+  @@index([tag])
+  @@index([date])
+  @@index([view])
+  @@index([tag, date])
 }
 
 model User {
