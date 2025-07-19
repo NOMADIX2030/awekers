@@ -66,7 +66,7 @@ export async function PUT(
     }
     
     // 업데이트할 데이터 준비
-    const updateData: any = {};
+    const updateData: Record<string, unknown> = {};
     
     if (email) updateData.email = email;
     if (password) {

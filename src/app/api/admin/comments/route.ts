@@ -26,8 +26,8 @@ export async function GET(request: NextRequest) {
 
     // 사용자와 블로그 정보를 별도로 조회
     if (comments.length > 0) {
-      const userIds = [...new Set(comments.map((c: any) => c.userId).filter(Boolean))];
-      const blogIds = [...new Set(comments.map((c: any) => c.blogId).filter(Boolean))];
+      const userIds = [...new Set(comments.map((c: { userId: number }) => c.userId).filter(Boolean))];
+      const blogIds = [...new Set(comments.map((c: { blogId: number }) => c.blogId).filter(Boolean))];
 
       const users = await prisma.user.findMany({
         where: { id: { in: userIds as number[] } },
@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
       });
 
       // 댓글 데이터에 사용자와 블로그 정보 추가
-      const commentsWithDetails = comments.map((comment: any) => ({
+      const commentsWithDetails = comments.map((comment: { id: number; content: string; userId: number; blogId: number; createdAt: Date }) => ({
         id: comment.id,
         content: comment.content,
         author: users.find(u => u.id === comment.userId)?.email || '알 수 없음',
@@ -107,7 +107,7 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: '댓글 ID가 필요합니다.' }, { status: 400 });
     }
 
-    const updateData: any = {};
+    const updateData: { content?: string; isHidden?: boolean } = {};
     if (typeof content === 'string') updateData.content = content;
     if (typeof isHidden === 'boolean') updateData.isHidden = isHidden;
 

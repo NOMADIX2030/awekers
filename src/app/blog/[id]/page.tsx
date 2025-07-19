@@ -350,7 +350,7 @@ const BlogDetailPage: React.FC = () => {
     }
     
     if (!res.ok) {
-      setCommentSubmitMsg((data as any).error || "댓글 등록에 실패했습니다.");
+      setCommentSubmitMsg((data as { error?: string }).error || "댓글 등록에 실패했습니다.");
       setCommentSubmitting(false);
       return;
     }

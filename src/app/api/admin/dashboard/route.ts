@@ -14,8 +14,8 @@ export async function GET(request: NextRequest) {
     let totalComments = 0;
     let totalViews = 0;
     let totalUsers = 0;
-    let recentPosts: any[] = [];
-    let recentComments: any[] = [];
+    let recentPosts: { id: number; title: string; date: Date; view: number; tag: string }[] = [];
+    let recentComments: { id: number; content: string; createdAt: Date; userId: number; blogId: number; user?: { id: number; email: string }; blog?: { id: number; title: string } }[] = [];
 
     try {
       // 각 쿼리를 개별적으로 실행하여 오류 방지
@@ -124,7 +124,7 @@ export async function GET(request: NextRequest) {
         totalUsers,
         totalTags: 0
       },
-      recentPosts: recentPosts.map((post: any) => ({
+      recentPosts: recentPosts.map((post) => ({
         id: post.id,
         title: post.title,
         date: post.date.toISOString().split('T')[0],
@@ -132,7 +132,7 @@ export async function GET(request: NextRequest) {
         views: post.view || 0,
         tag: post.tag
       })),
-      recentComments: recentComments.map((comment: any) => ({
+      recentComments: recentComments.map((comment) => ({
         id: comment.id,
         content: comment.content,
         date: comment.createdAt.toISOString().split('T')[0],

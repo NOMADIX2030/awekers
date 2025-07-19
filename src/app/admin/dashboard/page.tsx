@@ -268,7 +268,7 @@ const AdminDashboardPage: React.FC = () => {
             description="(조회수 순)"
           >
             <div className="space-y-2">
-              {dashboardData.recentPosts?.slice(0, 5).map((post: any, index: number) => (
+              {dashboardData.recentPosts?.slice(0, 5).map((post: { id: number; title: string; date: string; views: number }, index: number) => (
                 <RecentItem
                   key={post.id}
                   title={post.title}
@@ -297,13 +297,13 @@ const AdminDashboardPage: React.FC = () => {
             description="(최신순)"
           >
             <div className="space-y-2">
-              {dashboardData.recentComments?.slice(0, 5).map((comment: any) => (
+              {dashboardData.recentComments?.slice(0, 5).map((comment: { id: number; content: string; date: string; user: { email: string } }) => (
                 <RecentItem
                   key={comment.id}
                   title={comment.content}
                   date={comment.date}
-                  author={`작성자: ${comment.author}`}
-                  link={`/blog/${comment.blogId}#comment-${comment.id}`}
+                  author={`작성자: ${comment.user.email}`}
+                  link={`/blog/1#comment-${comment.id}`}
                 />
               ))}
               <div className="pt-4 border-t border-gray-200">

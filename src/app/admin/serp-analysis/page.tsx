@@ -14,12 +14,39 @@ import HelpTooltip from '../components/HelpTooltip';
 import { SERPHelpContent } from './data/helpContent';
 import HelpGuide from './components/HelpGuide';
 
+// SERP 데이터 타입 정의
+interface OverviewData {
+  totalVisits?: number;
+  visitsChange?: number;
+  organicTraffic?: number;
+  organicChange?: number;
+  bounceRate?: number;
+  avgSessionDuration?: number;
+  pageViews?: number;
+  uniqueVisitors?: number;
+  avgCTR?: number;
+  ctrChange?: number;
+  avgPosition?: number;
+  positionChange?: number;
+}
+
+interface SERPData {
+  overview?: OverviewData;
+  traffic?: unknown[];
+  keywords?: unknown[];
+  pages?: unknown[];
+  insights?: unknown[];
+  trafficTrend?: unknown[];
+  trafficSources?: unknown[];
+  pagePerformance?: unknown[];
+}
+
 const SERPAnalysisPage: React.FC = () => {
   const router = useRouter();
   const [selectedPeriod, setSelectedPeriod] = useState('30');
   const [compareMode, setCompareMode] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<SERPData | null>(null);
   const [configChanged, setConfigChanged] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
 
@@ -330,7 +357,15 @@ const SERPAnalysisPage: React.FC = () => {
               <h3 className="text-lg font-semibold text-gray-900">트래픽 상세 분석</h3>
             </div>
             <div className="h-80 sm:h-96">
-              <SERPTrafficChart data={data?.trafficTrend} />
+              <SERPTrafficChart data={data?.trafficTrend as unknown} />
+            </div>
+          </div>
+          <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">유입 소스 분석</h3>
+            </div>
+            <div className="h-80 sm:h-96">
+              <TrafficSourceChart data={data?.trafficSources as unknown} />
             </div>
           </div>
         </div>
@@ -349,7 +384,7 @@ const SERPAnalysisPage: React.FC = () => {
                 size="md"
               />
             </div>
-            <KeywordAnalysis data={data?.keywords} />
+            <KeywordAnalysis data={data?.keywords as unknown} />
           </div>
         </div>
       )}
@@ -367,7 +402,7 @@ const SERPAnalysisPage: React.FC = () => {
                 size="md"
               />
             </div>
-            <PagePerformanceTable data={data?.pagePerformance} />
+            <PagePerformanceTable data={data?.pagePerformance as unknown} />
           </div>
         </div>
       )}
@@ -385,7 +420,7 @@ const SERPAnalysisPage: React.FC = () => {
                 size="md"
               />
             </div>
-            <SERPInsights data={data?.insights} />
+            <SERPInsights data={data?.insights as unknown} />
           </div>
         </div>
       )}

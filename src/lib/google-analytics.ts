@@ -125,7 +125,10 @@ export async function getTrafficData(startDate: string, endDate: string): Promis
 
     const response = await callGoogleAnalyticsAPI('runReport', accessToken, config.propertyId);
     
-    return response.rows?.map((row: any) => ({
+    return response.rows?.map((row: {
+      dimensionValues: { value: string }[];
+      metricValues: { value: string }[];
+    }) => ({
       date: row.dimensionValues[0].value,
       source: row.dimensionValues[1].value,
       medium: row.dimensionValues[2].value,
@@ -175,7 +178,10 @@ export async function getTrafficSources(startDate: string, endDate: string): Pro
 
     const response = await callGoogleAnalyticsAPI('runReport', accessToken, config.propertyId);
     
-    return response.rows?.map((row: any) => ({
+    return response.rows?.map((row: {
+      dimensionValues: { value: string }[];
+      metricValues: { value: string }[];
+    }) => ({
       source: row.dimensionValues[0].value,
       medium: row.dimensionValues[1].value,
       sessions: parseInt(row.metricValues[0].value),
@@ -223,7 +229,10 @@ export async function getPagePerformance(startDate: string, endDate: string): Pr
 
     const response = await callGoogleAnalyticsAPI('runReport', accessToken, config.propertyId);
     
-    return response.rows?.map((row: any) => ({
+    return response.rows?.map((row: {
+      dimensionValues: { value: string }[];
+      metricValues: { value: string }[];
+    }) => ({
       pagePath: row.dimensionValues[0].value,
       pageTitle: row.dimensionValues[1].value,
       pageViews: parseInt(row.metricValues[0].value),

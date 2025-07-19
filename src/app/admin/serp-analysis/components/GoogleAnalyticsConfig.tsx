@@ -10,7 +10,11 @@ interface GoogleAnalyticsConfigProps {
 const GoogleAnalyticsConfig: React.FC<GoogleAnalyticsConfigProps> = ({ onConfigChange }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [config, setConfig] = useState<any>(null);
+  const [config, setConfig] = useState<{
+    isConfigured: boolean;
+    propertyId: string;
+    lastUpdated: string;
+  } | null>(null);
   const [formData, setFormData] = useState({
     propertyId: '',
     clientId: '',
