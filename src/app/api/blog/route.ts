@@ -1,13 +1,29 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-// GET: 블로그 목록
+// GET: 블로그 목록 (최적화)
 export async function GET() {
   try {
     const blogs = await prisma.blog.findMany({
+      select: {
+        id: true,
+        title: true,
+        summary: true,
+        tag: true,
+        image: true,
+        date: true,
+        view: true,
+      },
       orderBy: { date: "desc" },
+      take: 20, // 성능을 위해 제한
     });
-    return NextResponse.json(blogs);
+    
+    // 캐시 헤더 추가 (3분 캐시)
+    const response = NextResponse.json(blogs);
+    response.headers.set('Cache-Control', 'public, s-maxage=180, stale-while-revalidate=300');
+    response.headers.set('Content-Encoding', 'gzip');
+    
+    return response;
   } catch (error) {
     console.error('블로그 목록 조회 실패:', error);
     // 데이터베이스 연결 실패 시 빈 배열 반환

@@ -2,6 +2,18 @@
 // 서버 컴포넌트에서 prisma import
 import { prisma } from "@/lib/prisma";
 import { Metadata } from "next";
+import BlogListServer from "./components/BlogListServer";
+
+// 블로그 타입 정의
+interface Blog {
+  id: number;
+  title: string;
+  summary: string;
+  tag: string;
+  image: string;
+  date: Date;
+  view: number;
+}
 
 // SEO 메타데이터 동적 생성
 export async function generateMetadata(): Promise<Metadata> {
@@ -50,11 +62,11 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
+// 강력한 캐싱 전략 적용
+export const revalidate = 600; // 10분마다 재생성
+export const dynamic = 'force-static'; // 정적 생성 강제
 
-// src/app/page.tsx - 서버 컴포넌트 (SEO/SSR)
-import BlogListClient from "./components/BlogListClient";
-
-// 서버 컴포넌트: 블로그 리스트 클라이언트 컴포넌트만 렌더링
+// 서버 컴포넌트: 블로그 리스트 서버에서 직접 렌더링
 export default async function Home() {
   // DB에서 사이트 설정값 읽기 (오류 처리 추가)
   const settings: Record<string, string> = {};
@@ -67,10 +79,32 @@ export default async function Home() {
   }
   
   const siteName = settings.siteName || "Awekers";
+
+  // 서버에서 직접 블로그 데이터 쿼리 (캐싱 최적화)
+  let blogs: Blog[] = [];
+  try {
+    blogs = await prisma.blog.findMany({
+      select: {
+        id: true,
+        title: true,
+        summary: true,
+        tag: true,
+        image: true,
+        date: true,
+        view: true,
+      },
+      orderBy: {
+        date: "desc",
+      },
+      take: 10, // 성능을 위해 더 제한
+    });
+  } catch (error) {
+    console.error('블로그 데이터 로딩 실패:', error);
+  }
+
   return (
     <div className="w-full max-w-3xl mx-auto py-10">
-      {/* 사이트 이름을 BlogListClient에 전달 */}
-      <BlogListClient siteName={siteName} />
+      <BlogListServer siteName={siteName} blogs={blogs} />
     </div>
   );
 }

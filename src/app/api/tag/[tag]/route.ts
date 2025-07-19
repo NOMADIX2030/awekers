@@ -42,8 +42,11 @@ export async function GET(
     
     console.log("찾은 블로그 수:", blogs.length);
     
-    // 캐시 헤더 추가 (3분 캐시)
+    // CORS 헤더 추가
     const response = NextResponse.json({ blogs });
+    response.headers.set('Access-Control-Allow-Origin', '*');
+    response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     response.headers.set('Cache-Control', 'public, s-maxage=180, stale-while-revalidate=300');
     response.headers.set('Content-Encoding', 'gzip');
     
@@ -52,4 +55,13 @@ export async function GET(
     console.error("태그별 블로그 목록 조회 오류:", error);
     return NextResponse.json({ error: "서버 오류가 발생했습니다." }, { status: 500 });
   }
+}
+
+// OPTIONS 요청 처리 (CORS preflight)
+export async function OPTIONS() {
+  const response = new NextResponse(null, { status: 200 });
+  response.headers.set('Access-Control-Allow-Origin', '*');
+  response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  return response;
 } 

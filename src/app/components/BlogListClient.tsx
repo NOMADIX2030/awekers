@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import TagFilterBar from "./TagFilterBar";
 
 interface Blog {
@@ -74,13 +75,16 @@ const BlogListClient: React.FC<BlogListClientProps> = ({ siteName = "블로그" 
               onKeyDown={e => { if (e.key === 'Enter') router.push(`/blog/${blog.id}`); }}
             >
               {/* 카드 상단 이미지 */}
-              <div className="w-full aspect-[16/9] bg-gray-100 overflow-hidden">
+              <div className="w-full aspect-[16/9] bg-gray-100 overflow-hidden relative">
                 {blog.image && (
-                  <img
+                  <Image
                     src={blog.image}
                     alt={blog.title + ' 대표 이미지'}
-                    className="w-full h-full object-cover object-center transition-transform duration-300 group-hover:scale-105 rounded-t-2xl"
-                    loading="lazy"
+                    fill
+                    className="object-cover object-center transition-transform duration-300 group-hover:scale-105 rounded-t-2xl"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    priority={false}
+                    quality={75}
                   />
                 )}
               </div>
