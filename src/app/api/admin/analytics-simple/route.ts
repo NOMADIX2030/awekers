@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
         _count: { deviceType: true }
       });
 
-      const deviceStats = deviceStatsResult.map((stat: any) => ({
+      const deviceStats = deviceStatsResult.map((stat: { deviceType: string; _count: { deviceType: number } }) => ({
         device: stat.deviceType,
         count: stat._count.deviceType,
         percentage: totalVisits > 0 ? Math.round((stat._count.deviceType / totalVisits) * 100) : 0
@@ -61,7 +61,7 @@ export async function GET(request: NextRequest) {
         _count: { browser: true }
       });
 
-      const browserStats = browserStatsResult.map((stat: any) => ({
+      const browserStats = browserStatsResult.map((stat: { browser: string; _count: { browser: number } }) => ({
         browser: stat.browser,
         count: stat._count.browser,
         percentage: totalVisits > 0 ? Math.round((stat._count.browser / totalVisits) * 100) : 0
@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
         take: 5
       });
 
-      const topPages = topPagesResult.map((page: any) => ({
+      const topPages = topPagesResult.map((page: { pageUrl: string; pageTitle: string; _count: { pageUrl: number } }) => ({
         url: page.pageUrl,
         title: page.pageTitle,
         views: page._count.pageUrl

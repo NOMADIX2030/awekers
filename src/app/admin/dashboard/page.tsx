@@ -51,7 +51,26 @@ const RecentItem: React.FC<{
 
 const AdminDashboardPage: React.FC = () => {
   const router = useRouter();
-  const [dashboardData, setDashboardData] = useState<any>(null);
+  const [dashboardData, setDashboardData] = useState<{
+    stats?: {
+      totalPosts: number;
+      totalComments: number;
+      totalViews: number;
+      totalUsers: number;
+    };
+    recentPosts?: Array<{
+      id: number;
+      title: string;
+      views: number;
+      date: string;
+    }>;
+    recentComments?: Array<{
+      id: number;
+      content: string;
+      date: string;
+      user: { email: string };
+    }>;
+  } | null>(null);
   const [loading, setLoading] = useState(true);
   const [lastUpdate, setLastUpdate] = useState<string>("");
 

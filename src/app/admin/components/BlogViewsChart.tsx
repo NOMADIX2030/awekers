@@ -23,7 +23,7 @@ const BlogViewsChart: React.FC = () => {
         if (response.ok) {
           const data = await response.json();
           if (data.recentPosts) {
-            setBlogViews(data.recentPosts.map((post: any) => ({
+            setBlogViews(data.recentPosts.map((post: { title: string; views?: number; date: string }) => ({
               title: post.title,
               views: post.views || 0,
               date: post.date

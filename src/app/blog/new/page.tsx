@@ -61,7 +61,6 @@ const BlogNewPage: React.FC = () => {
     if (image && !isValidImageUrl(image)) {
       setImage(""); // 유효하지 않은 이미지 URL이면 입력란 비움
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [image]);
 
   // 실제 이미지 유효성 검사 (비동기, HEAD 요청)
@@ -91,7 +90,6 @@ const BlogNewPage: React.FC = () => {
     if (image && !imageValid) {
       setImage(""); // 유효하지 않은 이미지면 입력란 비움
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [imageValid]);
 
   // 모든 필드가 채워져 있고 이미지가 유효한지 체크

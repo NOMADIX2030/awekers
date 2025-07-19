@@ -49,7 +49,7 @@ const VisitorStats: React.FC = () => {
             thisWeek: Math.floor(Math.random() * 2000) + 500,
             thisMonth: Math.floor(Math.random() * 8000) + 2000,
             total: data.stats.totalViews || 15420,
-            topPages: data.recentPosts?.slice(0, 5).map((post: any) => ({
+            topPages: data.recentPosts?.slice(0, 5).map((post: { title: string; views: number }) => ({
               page: post.title,
               views: post.views
             })) || [

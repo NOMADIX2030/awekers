@@ -24,7 +24,13 @@ function extractJson(text: string): string {
 }
 
 // JSON 파싱 시도 (여러 방법으로 시도)
-function parseJsonSafely(text: string): any {
+function parseJsonSafely(text: string): {
+  title: string;
+  summary: string;
+  content: string;
+  tag: string;
+  image: string;
+} {
   // 1. 직접 파싱 시도
   try {
     return JSON.parse(text);

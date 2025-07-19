@@ -1,7 +1,7 @@
 "use client";
 // src/app/blog/[id]/page.tsx - 블로그 상세 뷰/수정 페이지
 import React, { useState, useEffect } from "react";
-import { notFound, useParams, useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
 // 태그 키워드에 백링크를 적용하는 함수
 function autoLinkKeywords(content: string, tagString: string, baseUrl: string) {
@@ -83,7 +83,16 @@ const BlogDetailPage: React.FC = () => {
   const router = useRouter();
 
   // 블로그 데이터 상태
-  const [blog, setBlog] = useState<any>(null);
+  const [blog, setBlog] = useState<{
+    id: number;
+    title: string;
+    summary: string;
+    content: string;
+    tag: string;
+    image: string;
+    date: string;
+    view: number;
+  } | null>(null);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState("");
 
@@ -247,7 +256,13 @@ const BlogDetailPage: React.FC = () => {
   }, []);
 
   // 댓글 상태
-  const [comments, setComments] = useState<any[]>([]);
+  const [comments, setComments] = useState<Array<{
+    id: number;
+    content: string;
+    createdAt: string;
+    user: { email: string };
+    _count: { likes: number; reports: number };
+  }>>([]);
   const [commentLoading, setCommentLoading] = useState(false);
   const [commentError, setCommentError] = useState("");
   // 댓글 입력 상태

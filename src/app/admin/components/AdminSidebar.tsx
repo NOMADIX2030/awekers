@@ -1,6 +1,6 @@
 "use client";
 // src/app/admin/components/AdminSidebar.tsx - 관리자 사이드바 네비게이션
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 

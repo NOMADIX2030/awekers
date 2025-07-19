@@ -106,7 +106,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "필수 파라미터가 누락되었습니다." }, { status: 400 });
     }
 
-    let updateData: any = {};
+    const updateData: Record<string, boolean> = {};
     let message = "";
     
     switch (action) {

@@ -43,7 +43,7 @@ const ServerlessVisitorStats: React.FC = () => {
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null);
   const [period, setPeriod] = useState('today');
   const [loading, setLoading] = useState(true);
-  const [localStats, setLocalStats] = useState<any>(null);
+  const [localStats, setLocalStats] = useState<Record<string, { visits: number }> | null>(null);
 
   useEffect(() => {
     const fetchAnalytics = async () => {
@@ -180,7 +180,7 @@ const ServerlessVisitorStats: React.FC = () => {
           <div className="mb-8 p-4 bg-yellow-50 rounded-lg">
             <h4 className="text-md font-medium text-gray-900 mb-2">📊 로컬 브라우저 통계</h4>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {Object.entries(localStats).slice(0, 4).map(([date, data]: [string, any]) => (
+              {Object.entries(localStats).slice(0, 4).map(([date, data]: [string, { visits: number }]) => (
                 <div key={date} className="text-center">
                   <div className="text-lg font-bold text-yellow-600">{data.visits}</div>
                   <div className="text-xs text-gray-600">{date}</div>

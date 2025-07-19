@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
 
     // 기간 설정
     const now = new Date();
-    let startDate = new Date();
+    const startDate = new Date();
     
     switch (period) {
       case 'week':
@@ -29,7 +29,21 @@ export async function GET(request: NextRequest) {
     }
 
     // 기본 통계 데이터 (실제 데이터가 없을 때를 대비한 더미 데이터)
-    const analyticsData = {
+    const analyticsData: {
+      period: string;
+      summary: {
+        totalVisits: number;
+        uniqueVisitors: number;
+        pageViews: number;
+        avgSessionDuration: number;
+        bounceRate: number;
+      };
+      deviceStats: Array<{ device: string; count: number; percentage: number }>;
+      browserStats: Array<{ browser: string; count: number; percentage: number }>;
+      osStats: Array<{ os: string; count: number; percentage: number }>;
+      topPages: Array<{ title: string; url: string; views: number }>;
+      timeSeries: Array<{ time?: string; date?: string; visits: number; pageViews: number }>;
+    } = {
       period,
       summary: {
         totalVisits: 0,
@@ -116,19 +130,19 @@ export async function GET(request: NextRequest) {
         analyticsData.summary.pageViews = totalVisits;
         analyticsData.summary.uniqueVisitors = totalVisits; // 간단히 동일하게 설정
 
-        analyticsData.deviceStats = deviceStats.map((stat: any) => ({
+        analyticsData.deviceStats = deviceStats.map((stat: { deviceType: string; _count: { deviceType: number } }) => ({
           device: stat.deviceType,
           count: stat._count.deviceType,
           percentage: Math.round((stat._count.deviceType / totalVisits) * 100)
         }));
 
-        analyticsData.browserStats = browserStats.map((stat: any) => ({
+        analyticsData.browserStats = browserStats.map((stat: { browser: string; _count: { browser: number } }) => ({
           browser: stat.browser,
           count: stat._count.browser,
           percentage: Math.round((stat._count.browser / totalVisits) * 100)
         }));
 
-        analyticsData.topPages = topPages.map((page: any) => ({
+        analyticsData.topPages = topPages.map((page: { pageTitle: string; pageUrl: string; _count: { pageTitle: number } }) => ({
           title: page.pageTitle,
           url: page.pageUrl,
           views: page._count.pageTitle
