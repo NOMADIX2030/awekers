@@ -8,10 +8,5 @@
   ],
   "env": {
     "DATABASE_URL": "@database_url"
-  },
-  "functions": {
-    "src/app/api/**/*.ts": {
-      "maxDuration": 30
-    }
   }
 } 
