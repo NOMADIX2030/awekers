@@ -6,7 +6,7 @@ import { Metadata } from "next";
 // SEO 메타데이터 동적 생성
 export async function generateMetadata(): Promise<Metadata> {
   // DB에서 사이트 설정값 읽기 (오류 처리 추가)
-  let settings: Record<string, string> = {};
+  const settings: Record<string, string> = {};
   try {
     const settingsArr = await prisma.siteSetting.findMany();
     settingsArr.forEach(s => { settings[s.key] = s.value; });
@@ -57,7 +57,7 @@ import BlogListClient from "./components/BlogListClient";
 // 서버 컴포넌트: 블로그 리스트 클라이언트 컴포넌트만 렌더링
 export default async function Home() {
   // DB에서 사이트 설정값 읽기 (오류 처리 추가)
-  let settings: Record<string, string> = {};
+  const settings: Record<string, string> = {};
   try {
     const settingsArr = await prisma.siteSetting.findMany();
     settingsArr.forEach(s => { settings[s.key] = s.value; });
