@@ -327,7 +327,7 @@ const SERPAnalysisPage: React.FC = () => {
                 />
               </div>
               <div className="h-64 sm:h-80">
-                <SERPTrafficChart data={data?.trafficTrend} />
+                <SERPTrafficChart data={data?.trafficTrend as any} />
               </div>
             </div>
 
@@ -342,7 +342,7 @@ const SERPAnalysisPage: React.FC = () => {
                 />
               </div>
               <div className="h-64 sm:h-80">
-                <TrafficSourceChart data={data?.trafficSources} />
+                <TrafficSourceChart data={data?.trafficSources as any} />
               </div>
             </div>
           </div>
@@ -357,7 +357,7 @@ const SERPAnalysisPage: React.FC = () => {
               <h3 className="text-lg font-semibold text-gray-900">트래픽 상세 분석</h3>
             </div>
             <div className="h-80 sm:h-96">
-              <SERPTrafficChart data={data?.trafficTrend as unknown} />
+              <SERPTrafficChart data={data?.trafficTrend as any} />
             </div>
           </div>
           <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
@@ -365,7 +365,7 @@ const SERPAnalysisPage: React.FC = () => {
               <h3 className="text-lg font-semibold text-gray-900">유입 소스 분석</h3>
             </div>
             <div className="h-80 sm:h-96">
-              <TrafficSourceChart data={data?.trafficSources as unknown} />
+              <TrafficSourceChart data={data?.trafficSources as any} />
             </div>
           </div>
         </div>
@@ -384,7 +384,7 @@ const SERPAnalysisPage: React.FC = () => {
                 size="md"
               />
             </div>
-            <KeywordAnalysis data={data?.keywords as unknown} />
+            <KeywordAnalysis data={data?.keywords as any} />
           </div>
         </div>
       )}
@@ -402,7 +402,7 @@ const SERPAnalysisPage: React.FC = () => {
                 size="md"
               />
             </div>
-            <PagePerformanceTable data={data?.pagePerformance as unknown} />
+            <PagePerformanceTable data={data?.pagePerformance as any} />
           </div>
         </div>
       )}
@@ -420,7 +420,7 @@ const SERPAnalysisPage: React.FC = () => {
                 size="md"
               />
             </div>
-            <SERPInsights data={data?.insights as unknown} />
+            <SERPInsights data={data?.insights as any} />
           </div>
         </div>
       )}
