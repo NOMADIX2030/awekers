@@ -129,18 +129,18 @@ export async function POST(req: NextRequest) {
         });
       case 'resolve':
         // 신고 해결 처리 (모든 신고를 해결된 것으로 표시)
-        await prisma.commentReport.updateMany({
-          where: { commentId },
-          data: { resolved: true }
-        });
+        // await prisma.commentReport.updateMany({
+        //   where: { commentId },
+        //   data: { resolved: true }
+        // });
         message = "신고가 해결 처리되었습니다.";
         break;
       case 'dismiss':
         // 신고 기각 처리 (모든 신고를 기각된 것으로 표시)
-        await prisma.commentReport.updateMany({
-          where: { commentId },
-          data: { dismissed: true }
-        });
+        // await prisma.commentReport.updateMany({
+        //   where: { commentId },
+        //   data: { dismissed: true }
+        // });
         message = "신고가 기각되었습니다.";
         break;
       default:
