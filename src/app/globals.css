@@ -12,15 +12,44 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* 블로그 본문 태그 백링크 스타일 */
+.tag-link {
+  color: #111;
+  font-weight: 700;
+  font-size: 1.1em;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.tag-link:hover {
+  color: #0070f3;
+}
+/* 스크롤바 숨김 클래스 */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari and Opera */
+}
+
+/* 모바일 터치 최적화 */
+@media (max-width: 640px) {
+  /* 터치 타겟 최소 크기 */
+  button, a, input, select, textarea {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* 터치 스크롤 최적화 */
+  .touch-scroll {
+    -webkit-overflow-scrolling: touch;
+  }
+}
+

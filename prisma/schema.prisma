@@ -1,0 +1,200 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+model Blog {
+  id       Int       @id @default(autoincrement())
+  title    String    @db.VarChar(255)
+  summary  String    @db.Text
+  content  String    @db.Text
+  tag      String    @db.VarChar(255)
+  image    String    @db.Text
+  date     DateTime  @default(now())
+  view     Int       @default(0)
+  comments Comment[]
+  visits   PageVisit[]
+  performance PagePerformance[]
+}
+
+model User {
+  id        Int             @id @default(autoincrement())
+  email     String          @unique
+  password  String
+  isAdmin   Boolean         @default(false)
+  createdAt DateTime        @default(now())
+  comments  Comment[]
+  likes     CommentLike[]
+  reports   CommentReport[]
+  visits    PageVisit[]
+}
+
+/// 사이트 환경설정 테이블
+model SiteSetting {
+  id        Int      @id @default(autoincrement())
+  key       String   @unique
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
+model Comment {
+  id        Int             @id @default(autoincrement())
+  blogId    Int
+  content   String          @db.Text
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  userId    Int
+  parentId  Int?
+  isHidden  Boolean         @default(false)
+  blog      Blog            @relation(fields: [blogId], references: [id])
+  user      User            @relation(fields: [userId], references: [id])
+  parent    Comment?        @relation("CommentToReplies", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  replies   Comment[]       @relation("CommentToReplies")
+  likes     CommentLike[]
+  reports   CommentReport[]
+}
+
+model CommentLike {
+  id        Int      @id @default(autoincrement())
+  commentId Int
+  userId    Int
+  createdAt DateTime @default(now())
+  comment   Comment  @relation(fields: [commentId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([commentId, userId])
+}
+
+model CommentReport {
+  id        Int      @id @default(autoincrement())
+  commentId Int
+  userId    Int
+  reason    String   @db.VarChar(255)
+  createdAt DateTime @default(now())
+  comment   Comment  @relation(fields: [commentId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([commentId, userId])
+}
+/// 접속자 통계를 위한 모델들
+model PageVisit {
+  id        Int      @id @default(autoincrement())
+  pageUrl   String   @db.VarChar(500)
+  pageTitle String   @db.VarChar(255)
+  userId    Int?
+  blogId    Int?
+  userAgent String   @db.Text
+  ipAddress String   @db.VarChar(45)
+  referrer  String?  @db.VarChar(500)
+  deviceType String  @db.VarChar(50) // desktop, mobile, tablet
+  browser   String   @db.VarChar(100)
+  os        String   @db.VarChar(100)
+  country   String?  @db.VarChar(100)
+  city      String?  @db.VarChar(100)
+  createdAt DateTime @default(now())
+  
+  user      User?    @relation(fields: [userId], references: [id])
+  blog      Blog?    @relation(fields: [blogId], references: [id])
+}
+
+model DailyStats {
+  id        Int      @id @default(autoincrement())
+  date      DateTime @unique
+  totalVisits Int    @default(0)
+  uniqueVisitors Int @default(0)
+  pageViews  Int     @default(0)
+  bounceRate Float   @default(0)
+  avgSessionDuration Int @default(0) // seconds
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model HourlyStats {
+  id        Int      @id @default(autoincrement())
+  date      DateTime
+  hour      Int
+  visits    Int      @default(0)
+  pageViews Int      @default(0)
+  createdAt DateTime @default(now())
+  
+  @@unique([date, hour])
+}
+
+/// SERP 분석을 위한 모델들
+model TrafficSource {
+  id        Int      @id @default(autoincrement())
+  date      DateTime
+  source    String   @db.VarChar(100) // google, naver, direct, social, etc.
+  medium    String   @db.VarChar(100) // organic, cpc, referral, etc.
+  visits    Int      @default(0)
+  pageViews Int      @default(0)
+  bounceRate Float   @default(0)
+  avgSessionDuration Int @default(0)
+  createdAt DateTime @default(now())
+  
+  @@unique([date, source, medium])
+}
+
+model SearchKeyword {
+  id        Int      @id @default(autoincrement())
+  date      DateTime
+  keyword   String   @db.VarChar(255)
+  source    String   @db.VarChar(100) // google, naver
+  visits    Int      @default(0)
+  impressions Int    @default(0)
+  clicks    Int      @default(0)
+  ctr       Float    @default(0) // Click Through Rate
+  avgPosition Float  @default(0)
+  createdAt DateTime @default(now())
+  
+  @@unique([date, keyword, source])
+}
+
+model PagePerformance {
+  id        Int      @id @default(autoincrement())
+  date      DateTime
+  pageUrl   String   @db.VarChar(500)
+  pageTitle String   @db.VarChar(255)
+  blogId    Int?
+  visits    Int      @default(0)
+  pageViews Int      @default(0)
+  avgTimeOnPage Int  @default(0) // seconds
+  bounceRate Float   @default(0)
+  exitRate  Float    @default(0)
+  createdAt DateTime @default(now())
+  
+  blog      Blog?    @relation(fields: [blogId], references: [id])
+  @@unique([date, pageUrl])
+}
+
+model SERPInsights {
+  id        Int      @id @default(autoincrement())
+  date      DateTime
+  metric    String   @db.VarChar(100) // organic_traffic, keyword_rankings, ctr
+  value     Float
+  change    Float    @default(0) // 이전 기간 대비 변화율
+  period    String   @db.VarChar(50) // daily, weekly, monthly
+  createdAt DateTime @default(now())
+  
+  @@unique([date, metric, period])
+}
+
+/// Google Analytics 설정
+model GoogleAnalyticsConfig {
+  id        Int      @id @default(autoincrement())
+  propertyId String  @db.VarChar(100) // GA4 Property ID
+  clientId  String   @db.VarChar(255) // OAuth Client ID
+  clientSecret String @db.VarChar(255) // OAuth Client Secret
+  refreshToken String @db.Text // OAuth Refresh Token
+  accessToken String? @db.Text // OAuth Access Token
+  tokenExpiry DateTime? // Access Token 만료 시간
+  isActive  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
