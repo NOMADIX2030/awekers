@@ -5,10 +5,16 @@ import { Metadata } from "next";
 
 // SEO 메타데이터 동적 생성
 export async function generateMetadata(): Promise<Metadata> {
-  // DB에서 사이트 설정값 읽기
-  const settingsArr = await prisma.siteSetting.findMany();
-  const settings: Record<string, string> = {};
-  settingsArr.forEach(s => { settings[s.key] = s.value; });
+  // DB에서 사이트 설정값 읽기 (오류 처리 추가)
+  let settings: Record<string, string> = {};
+  try {
+    const settingsArr = await prisma.siteSetting.findMany();
+    settingsArr.forEach(s => { settings[s.key] = s.value; });
+  } catch (error) {
+    console.warn('데이터베이스 연결 실패, 기본값 사용:', error);
+    // 기본값 사용
+  }
+  
   // 기본값
   const siteName = settings.siteName || "Awekers";
   const siteDesc = settings.siteDesc || "트렌디한 IT/AI 블로그";
@@ -50,10 +56,16 @@ import BlogListClient from "./components/BlogListClient";
 
 // 서버 컴포넌트: 블로그 리스트 클라이언트 컴포넌트만 렌더링
 export default async function Home() {
-  // DB에서 사이트 설정값 읽기
-  const settingsArr = await prisma.siteSetting.findMany();
-  const settings: Record<string, string> = {};
-  settingsArr.forEach(s => { settings[s.key] = s.value; });
+  // DB에서 사이트 설정값 읽기 (오류 처리 추가)
+  let settings: Record<string, string> = {};
+  try {
+    const settingsArr = await prisma.siteSetting.findMany();
+    settingsArr.forEach(s => { settings[s.key] = s.value; });
+  } catch (error) {
+    console.warn('데이터베이스 연결 실패, 기본값 사용:', error);
+    // 기본값 사용
+  }
+  
   const siteName = settings.siteName || "Awekers";
   return (
     <div className="w-full max-w-3xl mx-auto py-10">

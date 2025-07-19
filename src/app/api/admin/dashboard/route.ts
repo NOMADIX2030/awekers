@@ -136,7 +136,7 @@ export async function GET(request: NextRequest) {
         id: comment.id,
         content: comment.content,
         date: comment.createdAt.toISOString().split('T')[0],
-        author: comment.user?.email || '익명',
+        user: comment.user ? { email: comment.user.email } : undefined,
         blogTitle: comment.blog?.title || '알 수 없음'
       })),
       serverInfo

@@ -3,25 +3,36 @@ import { prisma } from "@/lib/prisma";
 
 // GET: 블로그 목록
 export async function GET() {
-  const blogs = await prisma.blog.findMany({
-    orderBy: { date: "desc" },
-  });
-  return NextResponse.json(blogs);
+  try {
+    const blogs = await prisma.blog.findMany({
+      orderBy: { date: "desc" },
+    });
+    return NextResponse.json(blogs);
+  } catch (error) {
+    console.error('블로그 목록 조회 실패:', error);
+    // 데이터베이스 연결 실패 시 빈 배열 반환
+    return NextResponse.json([]);
+  }
 }
 
 // POST: 블로그 등록
 export async function POST(req: NextRequest) {
-  const data = await req.json();
-  const blog = await prisma.blog.create({
-    data: {
-      title: data.title,
-      summary: data.summary,
-      content: data.content,
-      tag: data.tag,
-      image: data.image,
-    },
-  });
-  return NextResponse.json(blog);
+  try {
+    const data = await req.json();
+    const blog = await prisma.blog.create({
+      data: {
+        title: data.title,
+        summary: data.summary,
+        content: data.content,
+        tag: data.tag,
+        image: data.image,
+      },
+    });
+    return NextResponse.json(blog);
+  } catch (error) {
+    console.error('블로그 등록 실패:', error);
+    return NextResponse.json({ error: '블로그 등록에 실패했습니다.' }, { status: 500 });
+  }
 }
 
 // DELETE: 블로그 삭제
@@ -35,6 +46,7 @@ export async function DELETE(req: NextRequest) {
     await prisma.blog.delete({ where: { id: Number(id) } });
     return NextResponse.json({ success: true });
   } catch (error) {
+    console.error('블로그 삭제 실패:', error);
     return NextResponse.json({ error: '삭제 실패' }, { status: 500 });
   }
 } 

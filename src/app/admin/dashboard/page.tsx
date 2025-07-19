@@ -68,7 +68,7 @@ const AdminDashboardPage: React.FC = () => {
       id: number;
       content: string;
       date: string;
-      user: { email: string };
+      user?: { email: string };
     }>;
   } | null>(null);
   const [loading, setLoading] = useState(true);
@@ -297,12 +297,12 @@ const AdminDashboardPage: React.FC = () => {
             description="(최신순)"
           >
             <div className="space-y-2">
-              {dashboardData.recentComments?.slice(0, 5).map((comment: { id: number; content: string; date: string; user: { email: string } }) => (
+              {dashboardData.recentComments?.slice(0, 5).map((comment: { id: number; content: string; date: string; user?: { email: string } }) => (
                 <RecentItem
                   key={comment.id}
                   title={comment.content}
                   date={comment.date}
-                  author={`작성자: ${comment.user.email}`}
+                  author={`작성자: ${comment.user?.email || '알 수 없음'}`}
                   link={`/blog/1#comment-${comment.id}`}
                 />
               ))}
