@@ -268,11 +268,11 @@ export async function GET(request: NextRequest) {
         positionChange: -0.3
       };
 
-      serpData.trafficTrend = trafficTrend;
-      serpData.trafficSources = trafficSources;
-      serpData.keywords = keywords;
-      serpData.pagePerformance = pagePerformanceData;
-      serpData.insights = insights;
+      (serpData as any).trafficTrend = trafficTrend;
+      (serpData as any).trafficSources = trafficSources;
+      (serpData as any).keywords = keywords;
+      (serpData as any).pagePerformance = pagePerformanceData;
+      (serpData as any).insights = insights;
 
     } catch (error) {
       console.error('SERP 데이터 수집 오류:', error);
