@@ -3,6 +3,9 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --naver-green: #03C75A;
+  --naver-green-hover: #02B352;
+  --naver-green-light: #E8F5ED;
 }
 
 @theme inline {
@@ -15,7 +18,110 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
+}
+
+/* 네이버 SEO 검사 전용 스타일 */
+.bg-naver-green {
+  background-color: var(--naver-green);
+}
+
+.text-naver-green {
+  color: var(--naver-green);
+}
+
+.border-naver-green {
+  border-color: var(--naver-green);
+}
+
+.hover\:bg-naver-green:hover {
+  background-color: var(--naver-green-hover);
+}
+
+.focus\:ring-naver-green:focus {
+  --tw-ring-color: var(--naver-green);
+}
+
+/* 모바일 사이드 메뉴 강제 스타일 */
+.mobile-sidebar-overlay {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background-color: rgba(0, 0, 0, 0.3) !important;
+  z-index: 999999 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  touch-action: none !important;
+}
+
+.mobile-sidebar-content {
+  position: relative !important;
+  width: 80% !important;
+  height: 100% !important;
+  background-color: white !important;
+  z-index: 999999 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+}
+
+.mobile-sidebar-header {
+  background-color: white !important;
+  border-bottom: 1px solid #f3f4f6 !important;
+  flex-shrink: 0 !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+}
+
+.mobile-sidebar-menu {
+  background-color: white !important;
+  flex: 1 !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  max-height: calc(100vh - 120px) !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: #cbd5e0 transparent !important;
+  touch-action: pan-y !important;
+}
+
+.mobile-sidebar-menu::-webkit-scrollbar {
+  width: 4px !important;
+}
+
+.mobile-sidebar-menu::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+
+.mobile-sidebar-menu::-webkit-scrollbar-thumb {
+  background-color: #cbd5e0 !important;
+  border-radius: 2px !important;
+}
+
+.mobile-sidebar-menu::-webkit-scrollbar-thumb:hover {
+  background-color: #a0aec0 !important;
+}
+
+.mobile-sidebar-footer {
+  background-color: white !important;
+  border-top: 1px solid #f3f4f6 !important;
+  flex-shrink: 0 !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+}
+
+/* 모바일 사이드 메뉴가 열렸을 때 body 스크롤 방지 */
+body.sidebar-open {
+  overflow: hidden !important;
+  position: fixed !important;
+  width: 100% !important;
+  height: 100% !important;
+  touch-action: none !important;
 }
 
 /* 블로그 본문 태그 백링크 스타일 */
@@ -51,5 +157,831 @@ body {
   .touch-scroll {
     -webkit-overflow-scrolling: touch;
   }
+  
+  /* 모바일 사이드 메뉴 강제 레이어링 */
+  .mobile-sidebar-overlay {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    background-color: rgba(0, 0, 0, 0.3) !important;
+    z-index: 999999 !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  
+  .mobile-sidebar-content {
+    width: 80% !important;
+    background-color: white !important;
+  }
+  
+  /* 모바일 헤더 풀사이즈 최적화 */
+  .mobile-header-full {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+  }
+  
+  /* 모바일에서 PC 사이드메뉴 완전 숨김 */
+  .pc-sidebar-overlay {
+    display: none !important;
+  }
 }
+
+/* 패드 구간 최적화 (768px - 1024px) */
+@media (min-width: 641px) and (max-width: 1024px) {
+  /* 헤더 텍스트 크기 20% 축소 */
+  .header-logo {
+    font-size: 1.25rem !important; /* text-xl 대신 더 작은 크기 */
+  }
+  
+  /* 헤더 높이 조정 */
+  header {
+    height: 4rem !important; /* h-16 */
+  }
+  
+  /* 패드에서 모바일 헤더 스타일 적용 */
+  header {
+    background-color: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(10px) !important;
+  }
+  
+  /* 패드에서 햄버거 버튼 표시 */
+  .hamburger-button {
+    display: flex !important;
+  }
+  
+  /* PC 네비게이션 숨김 */
+  nav.hidden.xl\\:flex {
+    display: none !important;
+  }
+  
+  /* 패드에서 PC 사이드메뉴 완전 숨김 */
+  .pc-sidebar-overlay {
+    display: none !important;
+  }
+}
+
+/* 중간 크기 화면 (1025px - 1279px) */
+@media (min-width: 1025px) and (max-width: 1279px) {
+  /* 데스크톱에서 햄버거 버튼 표시 */
+  .hamburger-button {
+    display: flex !important;
+  }
+  
+  /* PC 네비게이션 숨김 */
+  nav.hidden.xl\\:flex {
+    display: none !important;
+  }
+  
+  /* 중간 크기에서 PC 사이드메뉴 완전 숨김 */
+  .pc-sidebar-overlay {
+    display: none !important;
+  }
+}
+
+/* 데스크톱 구간 (1025px 이상) */
+@media (min-width: 1025px) {
+  /* 데스크톱에서 햄버거 버튼 표시 */
+  .hamburger-button {
+    display: flex !important;
+  }
+  
+  /* PC 네비게이션 숨김 */
+  nav.hidden.xl\\:flex {
+    display: none !important;
+  }
+}
+
+/* PC 전체 화면 사이드메뉴 스타일 */
+.pc-sidebar-overlay {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background-color: white !important;
+  z-index: 999999 !important;
+  display: none !important; /* 기본적으로 숨김 */
+  overflow: hidden !important;
+}
+
+/* 데스크톱에서만 PC 사이드메뉴 표시 */
+@media (min-width: 1280px) {
+  .pc-sidebar-overlay {
+    display: flex !important;
+  }
+}
+
+.pc-sidebar-content {
+  position: relative !important;
+  width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: row !important;
+  overflow: hidden !important;
+}
+
+.pc-sidebar-main {
+  flex: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  padding: 2rem 2rem 2rem 2rem !important;
+}
+
+.pc-sidebar-info {
+  width: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  padding: 1.5rem !important;
+  border-left: 1px solid #f3f4f6 !important;
+}
+
+/* 반응형 브레이크포인트별 스타일 */
+@media (min-width: 1024px) {
+  .pc-sidebar-info {
+    width: 33.333333% !important;
+    padding: 2rem !important;
+  }
+}
+
+@media (min-width: 1280px) {
+  .pc-sidebar-info {
+    width: 25% !important;
+    padding: 3rem !important;
+  }
+}
+
+@media (min-width: 1536px) {
+  .pc-sidebar-info {
+    width: 20% !important;
+    padding: 3rem !important;
+  }
+}
+
+.pc-close-button {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 2.5rem !important;
+  height: 2.5rem !important;
+  border-radius: 0.5rem !important;
+  transition: all 0.3s ease !important;
+}
+
+@media (min-width: 1024px) {
+  .pc-close-button {
+    width: 3rem !important;
+    height: 3rem !important;
+  }
+}
+
+.pc-close-button:hover {
+  background-color: #f3f4f6 !important;
+  transform: scale(1.05) !important;
+}
+
+/* PC 사이드메뉴 애니메이션 */
+.pc-sidebar-overlay {
+  animation: pcSidebarFadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes pcSidebarFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* PC 사이드메뉴 메뉴 아이템 호버 효과 */
+.pc-sidebar-main a {
+  position: relative;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: left center;
+}
+
+.pc-sidebar-main a:hover {
+  transform: translateX(8px);
+}
+
+/* PC 사이드메뉴 CTA 버튼 특별 스타일 */
+.pc-sidebar-main button {
+  position: relative;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: left center;
+}
+
+.pc-sidebar-main button:hover {
+  transform: translateX(8px);
+}
+
+/* PC 사이드메뉴 부가 정보 링크 호버 효과 */
+.pc-sidebar-info a {
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: left center;
+}
+
+.pc-sidebar-info a:hover {
+  transform: translateX(4px);
+}
+
+/* 서브메뉴 호버 및 클릭 효과 */
+.submenu-container {
+  position: absolute;
+  left: 0;
+  top: 100%;
+  overflow: hidden;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 10;
+  max-height: 0;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  padding-left: 1rem;
+  margin-top: 0.5rem;
+}
+
+@media (min-width: 1024px) {
+  .submenu-container {
+    padding-left: 1.5rem;
+    margin-top: 0.75rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .submenu-container {
+    padding-left: 2rem;
+    margin-top: 1rem;
+  }
+}
+
+/* 그룹 호버 효과 */
+.group:hover .group-hover\:opacity-100 {
+  opacity: 1 !important;
+}
+
+.group:hover .group-hover\:visible {
+  visibility: visible !important;
+}
+
+.group:hover .group-hover\:translate-x-2 {
+  transform: translateX(8px) !important;
+}
+
+.group:hover .group-hover\:translate-y-0 {
+  transform: translateY(0) !important;
+}
+
+/* 서브메뉴 활성화 상태 */
+.submenu-active .submenu-container {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: translateY(0) !important;
+  max-height: 300px !important;
+}
+
+/* 서브메뉴 아이템 개별 애니메이션 */
+.submenu-container a {
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 서브메뉴가 활성화되었을 때 아이템들 표시 */
+.submenu-container.opacity-100 a {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* 메뉴 아이템 기본 스타일 */
+.menu-item {
+  position: relative;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 서브메뉴가 활성화될 때 메뉴 아이템 간격 조정 */
+.menu-item:has(.submenu-container.opacity-100) {
+  margin-bottom: 2rem;
+}
+
+/* 서브메뉴 아이템 순차 애니메이션 */
+.submenu-container.opacity-100 a:nth-child(1) { transition-delay: 0.1s; }
+.submenu-container.opacity-100 a:nth-child(2) { transition-delay: 0.15s; }
+.submenu-container.opacity-100 a:nth-child(3) { transition-delay: 0.2s; }
+.submenu-container.opacity-100 a:nth-child(4) { transition-delay: 0.25s; }
+.submenu-container.opacity-100 a:nth-child(5) { transition-delay: 0.3s; }
+
+/* 반응형 타이포그래피 */
+@media (max-width: 1279px) {
+  .pc-sidebar-main {
+    padding: 1.5rem !important;
+  }
+  
+  .pc-sidebar-info {
+    padding: 1rem !important;
+  }
+}
+
+/* 최대 너비 제한으로 가독성 향상 */
+.pc-sidebar-main > div {
+  max-width: 1200px !important;
+  width: 100% !important;
+}
+
+/* 부드러운 스크롤 */
+.pc-sidebar-content {
+  scroll-behavior: smooth !important;
+}
+
+/* 포커스 스타일 */
+.pc-sidebar-main a:focus,
+.pc-sidebar-info a:focus,
+.pc-close-button:focus {
+  outline: 2px solid #3b82f6 !important;
+  outline-offset: 2px !important;
+  border-radius: 4px !important;
+}
+
+/* 햄버거 버튼 애니메이션 효과 */
+.hamburger-line {
+  transform-origin: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+
+.hamburger-button:hover .hamburger-line {
+  background-color: #374151;
+}
+
+.hamburger-button:active {
+  transform: scale(0.95);
+}
+
+/* 2개 라인 햄버거 버튼 특화 애니메이션 */
+.hamburger-button .hamburger-line:nth-child(1) {
+  transform-origin: 50% 50%;
+}
+
+.hamburger-button .hamburger-line:nth-child(2) {
+  transform-origin: 50% 50%;
+}
+
+/* 열림 상태에서의 X자 애니메이션 */
+.hamburger-button[aria-label*="닫기"] .hamburger-line:nth-child(1) {
+  transform: rotate(45deg) translateY(0);
+}
+
+.hamburger-button[aria-label*="닫기"] .hamburger-line:nth-child(2) {
+  transform: rotate(-45deg) translateY(0);
+}
+
+/* 트렌디한 PC 사이드메뉴 스타일 */
+
+/* 서브메뉴 패널 애니메이션 */
+.submenu-panel {
+  position: absolute;
+  inset: 0;
+  transition: all 0.7s cubic-bezier(0.23, 1, 0.32, 1);
+  transform-origin: left center;
+}
+
+/* 서브메뉴 아이템 개별 애니메이션 */
+.submenu-item {
+  opacity: 0;
+  transform: translateY(20px) scale(0.98);
+  animation: none;
+}
+
+/* 서브메뉴가 활성화될 때 아이템 애니메이션 */
+.submenu-panel.opacity-100 .submenu-item {
+  animation: submenuItemSlideIn 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+
+@keyframes submenuItemSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* 서브메뉴 아이템 순차 애니메이션 */
+.submenu-panel.opacity-100 .submenu-item:nth-child(2) { animation-delay: 0.1s; }
+.submenu-panel.opacity-100 .submenu-item:nth-child(3) { animation-delay: 0.2s; }
+.submenu-panel.opacity-100 .submenu-item:nth-child(4) { animation-delay: 0.3s; }
+.submenu-panel.opacity-100 .submenu-item:nth-child(5) { animation-delay: 0.4s; }
+.submenu-panel.opacity-100 .submenu-item:nth-child(6) { animation-delay: 0.5s; }
+
+/* 1차 메뉴 미니멀 호버 효과 */
+.menu-item a {
+  position: relative;
+  transform-origin: left center;
+  transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* 좌측 라인 효과 제거됨 - 위에서 display: none 적용 */
+
+/* 서브메뉴 아이템 미니멀 호버 효과 */
+.submenu-item a {
+  position: relative;
+  background: transparent;
+  border: none;
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.submenu-item a:hover {
+  background: rgba(0, 0, 0, 0.02);
+  border-left-color: black;
+  transform: translateX(8px);
+}
+
+/* 언더라인 확장 애니메이션 */
+.submenu-item a:hover .h-0\.5 {
+  width: 6rem;
+  background: black;
+}
+
+@media (min-width: 1024px) {
+  .submenu-item a:hover .lg\\:w-16 {
+    width: 8rem;
+  }
+}
+
+/* 텍스트 대비 개선 */
+.submenu-item h3 {
+  letter-spacing: -0.02em;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+/* 기본 상태 표시 미니멀 애니메이션 */
+.absolute.inset-0.flex.items-center.justify-center {
+  animation: subtlePulse 4s ease-in-out infinite;
+}
+
+@keyframes subtlePulse {
+  0%, 100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.01);
+  }
+}
+
+/* 스크롤바 미니멀 스타일링 */
+.submenu-panel::-webkit-scrollbar {
+  width: 4px;
+}
+
+.submenu-panel::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.submenu-panel::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
+}
+
+.submenu-panel::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+/* 포커스 스타일 */
+.menu-item a:focus,
+.submenu-item a:focus {
+  outline: 2px solid black;
+  outline-offset: 4px;
+}
+
+/* 반응형 애니메이션 최적화 */
+@media (prefers-reduced-motion: reduce) {
+  .submenu-panel,
+  .submenu-item,
+  .menu-item a {
+    animation: none !important;
+    transition: opacity 0.2s ease, transform 0.2s ease !important;
+  }
+}
+
+/* 고대비 모드 지원 */
+@media (prefers-contrast: high) {
+  .menu-item a::before {
+    background: black;
+    width: 4px;
+  }
+  
+  .submenu-item a:hover {
+    background: rgba(0, 0, 0, 0.1);
+    border-left-width: 3px;
+  }
+  
+  .text-gray-700 {
+    color: black !important;
+  }
+  
+  .text-gray-400 {
+    color: rgba(0, 0, 0, 0.7) !important;
+  }
+}
+
+/* 블랙앤화이트 PC 사이드메뉴 스타일 - 일체감 개선 */
+
+/* 1차 메뉴 영역 동적 크기 조정 */
+.pc-sidebar-main .flex-shrink-0 {
+  width: auto;
+  max-width: 50%;
+  flex-basis: auto;
+}
+
+/* 1차 메뉴 텍스트 크기별 최적화 */
+@media (min-width: 1024px) {
+  .pc-sidebar-main .flex-shrink-0 {
+    max-width: 45%;
+  }
+}
+
+@media (min-width: 1280px) {
+  .pc-sidebar-main .flex-shrink-0 {
+    max-width: 40%;
+  }
+}
+
+@media (min-width: 1536px) {
+  .pc-sidebar-main .flex-shrink-0 {
+    max-width: 35%;
+  }
+}
+
+/* 마우스 브릿지 영역 */
+.mouse-bridge {
+  position: absolute;
+  left: -1.5rem;
+  top: 0;
+  width: 1.5rem;
+  height: 100%;
+  background: transparent;
+  z-index: 10;
+  pointer-events: auto;
+}
+
+/* 라인 브릿지 스타일 */
+.menu-item .inline-flex div {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* 1차 메뉴 활성화 시 라인 확장 */
+.menu-item a.text-black div {
+  width: 3rem !important;
+  background: black !important;
+}
+
+@media (min-width: 1024px) {
+  .menu-item a.text-black div {
+    width: 4rem !important;
+  }
+}
+
+@media (min-width: 1280px) {
+  .menu-item a.text-black div {
+    width: 5rem !important;
+  }
+}
+
+/* 서브메뉴 패널이 보이지 않을 때 포인터 이벤트 차단 */
+.submenu-panel.opacity-0 {
+  pointer-events: none;
+}
+
+/* 서브메뉴 패널이 보일 때 포인터 이벤트 활성화 */
+.submenu-panel.opacity-100 {
+  pointer-events: auto;
+}
+
+/* 중복 제거됨 - 위에서 통합 정의 */
+
+@keyframes submenuItemSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* 서브메뉴 아이템 순차 애니메이션 - 더 빠른 간격 */
+.submenu-panel.opacity-100 .submenu-item:nth-child(1) { animation-delay: 0s; }
+.submenu-panel.opacity-100 .submenu-item:nth-child(2) { animation-delay: 0.05s; }
+.submenu-panel.opacity-100 .submenu-item:nth-child(3) { animation-delay: 0.1s; }
+.submenu-panel.opacity-100 .submenu-item:nth-child(4) { animation-delay: 0.15s; }
+.submenu-panel.opacity-100 .submenu-item:nth-child(5) { animation-delay: 0.2s; }
+.submenu-panel.opacity-100 .submenu-item:nth-child(6) { animation-delay: 0.25s; }
+
+/* 중복 제거됨 - 좌측 라인 효과는 위에서 완전 제거 */
+
+/* 서브메뉴 아이템 미니멀 호버 효과 - 더 부드럽게 */
+.submenu-item a {
+  position: relative;
+  background: transparent;
+  border: none;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.submenu-item a:hover {
+  background: rgba(0, 0, 0, 0.03);
+  border-left-color: black;
+  transform: translateX(6px);
+}
+
+/* 언더라인 확장 애니메이션 - 더 부드럽게 */
+.submenu-item a:hover .h-0\.5 {
+  width: 5rem;
+  background: black;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (min-width: 1024px) {
+  .submenu-item a:hover .lg\\:w-16 {
+    width: 7rem;
+  }
+}
+
+/* 텍스트 대비 개선 */
+.submenu-item h3 {
+  letter-spacing: -0.01em;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+
+
+/* 연결성을 위한 시각적 가이드 */
+.menu-item:hover + .submenu-panel::before,
+.submenu-panel.opacity-100::before {
+  content: '';
+  position: absolute;
+  left: -8px;
+  top: 0;
+  width: 1px;
+  height: 100%;
+  background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.1), transparent);
+  opacity: 0.5;
+}
+
+/* 스크롤바 미니멀 스타일링 - 더 얇게 */
+.submenu-panel::-webkit-scrollbar {
+  width: 3px;
+}
+
+.submenu-panel::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.submenu-panel::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 1.5px;
+}
+
+.submenu-panel::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* 포커스 스타일 - 더 부드럽게 */
+.menu-item a:focus,
+.submenu-item a:focus {
+  outline: 2px solid rgba(0, 0, 0, 0.8);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* 반응형 애니메이션 최적화 */
+@media (prefers-reduced-motion: reduce) {
+  .submenu-panel,
+  .submenu-item,
+  .menu-item a {
+    animation: none !important;
+    transition: opacity 0.2s ease, transform 0.2s ease !important;
+  }
+}
+
+/* 고대비 모드 지원 */
+@media (prefers-contrast: high) {
+  .menu-item a::before {
+    background: black;
+    width: 3px;
+  }
+  
+  .submenu-item a:hover {
+    background: rgba(0, 0, 0, 0.08);
+    border-left-width: 3px;
+  }
+  
+  .text-gray-700 {
+    color: black !important;
+  }
+  
+  .text-gray-400 {
+    color: rgba(0, 0, 0, 0.8) !important;
+  }
+}
+
+/* 중복 제거됨 - 아래에서 최적화된 스타일 적용 */
+
+/* 1차메뉴만 사용하는 깔끔한 메뉴 스타일 */
+.menu-item {
+  height: auto;
+  display: flex;
+  align-items: center;
+  line-height: 1.4;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 80px;
+}
+
+.menu-item a {
+  position: relative;
+  transform-origin: left center;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  letter-spacing: -0.02em;
+  font-weight: 600;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  border-radius: 8px;
+}
+
+.menu-item a:hover {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+/* 좌측 라인 효과 완전 제거 */
+.menu-item a::before {
+  display: none !important;
+}
+
+.menu-item a:hover::before,
+.menu-item a.text-black::before {
+  display: none !important;
+}
+
+/* 로그인/로그아웃 버튼 스타일 */
+.auth-button {
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.6s ease;
+}
+
+.auth-button:hover::before {
+  left: 100%;
+}
+
+/* 로그인 버튼 특별 효과 */
+.auth-button:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+/* 반응형 조정 */
+@media (max-width: 768px) {
+  .auth-button {
+    width: 44px;
+    height: 44px;
+  }
+  
+  .auth-button svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
 

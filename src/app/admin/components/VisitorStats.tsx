@@ -1,6 +1,7 @@
 "use client";
 // src/app/admin/components/VisitorStats.tsx - 접속자 통계 컴포넌트
 import React, { useState, useEffect } from "react";
+import './styles.css';
 
 interface VisitorData {
   today: number;
@@ -145,7 +146,7 @@ const VisitorStats: React.FC = () => {
               <div className="flex items-center">
                 <div className="w-24 bg-gray-200 rounded-full h-2 mr-2">
                   <div 
-                    className="bg-blue-600 h-2 rounded-full" 
+                    className="bg-blue-600 h-2 rounded-full visitor-stats-progress" 
                     style={{ width: `${visitorData.deviceStats.desktop}%` }}
                   ></div>
                 </div>
@@ -160,7 +161,7 @@ const VisitorStats: React.FC = () => {
               <div className="flex items-center">
                 <div className="w-24 bg-gray-200 rounded-full h-2 mr-2">
                   <div 
-                    className="bg-green-600 h-2 rounded-full" 
+                    className="bg-green-600 h-2 rounded-full visitor-stats-progress" 
                     style={{ width: `${visitorData.deviceStats.mobile}%` }}
                   ></div>
                 </div>
@@ -175,7 +176,7 @@ const VisitorStats: React.FC = () => {
               <div className="flex items-center">
                 <div className="w-24 bg-gray-200 rounded-full h-2 mr-2">
                   <div 
-                    className="bg-purple-600 h-2 rounded-full" 
+                    className="bg-purple-600 h-2 rounded-full visitor-stats-progress" 
                     style={{ width: `${visitorData.deviceStats.tablet}%` }}
                   ></div>
                 </div>

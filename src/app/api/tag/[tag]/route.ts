@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import prisma from "@/lib/prisma";
 
 // GET: 특정 태그의 블로그 글 목록 반환 (최적화)
 export async function GET(

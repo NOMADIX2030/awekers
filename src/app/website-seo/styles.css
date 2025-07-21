@@ -1,0 +1,16 @@
+/* Website SEO Page Styles */
+
+/* Background Animation Elements */
+.background-animation-pulse-4s {
+  animation-duration: 4s;
+}
+
+.background-animation-pulse-4s-delay-1s {
+  animation-delay: 1s;
+  animation-duration: 4s;
+}
+
+.background-animation-pulse-4s-delay-2s {
+  animation-delay: 2s;
+  animation-duration: 4s;
+} 

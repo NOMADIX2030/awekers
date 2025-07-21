@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import prisma from '../../../../lib/prisma';
+import { QueryOptimizer } from '../../../../lib/admin/QueryOptimizer';
 
 export async function GET(request: NextRequest) {
   try {
@@ -28,59 +29,64 @@ export async function GET(request: NextRequest) {
     }
 
     try {
-      // 실제 데이터베이스에서 통계 조회 (서버리스 최적화)
-      const totalVisits = await prisma.pageVisit.count({
-        where: { createdAt: { gte: startDate } }
+      // 🚀 중앙집중식 최적화 적용 (QueryOptimizer 패턴)
+      console.log('🎯 간단 분석: QueryOptimizer 적용 시작');
+      const startTime = performance.now();
+
+      // 🚀 중앙집중식: 모든 통계 쿼리를 병렬로 실행 (5개 쿼리 → 1번 병렬 실행)
+      const statsResult = await QueryOptimizer.getInstance().executeParallel({
+        totalVisits: () => prisma.pageVisit.count({
+          where: { createdAt: { gte: startDate } }
+        }),
+        uniqueVisitorsResult: () => prisma.pageVisit.groupBy({
+          by: ['ipAddress'],
+          where: { createdAt: { gte: startDate } },
+          _count: { ipAddress: true }
+        }),
+        deviceStatsResult: () => prisma.pageVisit.groupBy({
+          by: ['deviceType'],
+          where: { createdAt: { gte: startDate } },
+          _count: { deviceType: true }
+        }),
+        browserStatsResult: () => prisma.pageVisit.groupBy({
+          by: ['browser'],
+          where: { createdAt: { gte: startDate } },
+          _count: { browser: true }
+        }),
+        topPagesResult: () => prisma.pageVisit.groupBy({
+          by: ['pageUrl', 'pageTitle'],
+          where: { createdAt: { gte: startDate } },
+          _count: { pageUrl: true },
+          orderBy: { _count: { pageUrl: 'desc' } },
+          take: 5
+        })
       });
 
-      // 고유 방문자 수 (IP 기준)
-      const uniqueVisitorsResult = await prisma.pageVisit.groupBy({
-        by: ['ipAddress'],
-        where: { createdAt: { gte: startDate } },
-        _count: { ipAddress: true }
-      });
-      const uniqueVisitors = uniqueVisitorsResult.length;
+      // 🚀 중앙집중식 결과 처리
+      const totalVisits = statsResult.totalVisits;
+      const uniqueVisitors = statsResult.uniqueVisitorsResult.length;
 
-      // 디바이스별 통계
-      const deviceStatsResult = await prisma.pageVisit.groupBy({
-        by: ['deviceType'],
-        where: { createdAt: { gte: startDate } },
-        _count: { deviceType: true }
-      });
-
-      const deviceStats = deviceStatsResult.map((stat: { deviceType: string; _count: { deviceType: number } }) => ({
+      const deviceStats = statsResult.deviceStatsResult.map((stat: any) => ({
         device: stat.deviceType,
         count: stat._count.deviceType,
         percentage: totalVisits > 0 ? Math.round((stat._count.deviceType / totalVisits) * 100) : 0
       }));
 
-      // 브라우저별 통계
-      const browserStatsResult = await prisma.pageVisit.groupBy({
-        by: ['browser'],
-        where: { createdAt: { gte: startDate } },
-        _count: { browser: true }
-      });
-
-      const browserStats = browserStatsResult.map((stat: { browser: string; _count: { browser: number } }) => ({
+      const browserStats = statsResult.browserStatsResult.map((stat: any) => ({
         browser: stat.browser,
         count: stat._count.browser,
         percentage: totalVisits > 0 ? Math.round((stat._count.browser / totalVisits) * 100) : 0
       }));
 
-      // 인기 페이지
-      const topPagesResult = await prisma.pageVisit.groupBy({
-        by: ['pageUrl', 'pageTitle'],
-        where: { createdAt: { gte: startDate } },
-        _count: { pageUrl: true },
-        orderBy: { _count: { pageUrl: 'desc' } },
-        take: 5
-      });
-
-      const topPages = topPagesResult.map((page: { pageUrl: string; pageTitle: string; _count: { pageUrl: number } }) => ({
+      const topPages = statsResult.topPagesResult.map((page: any) => ({
         url: page.pageUrl,
         title: page.pageTitle,
         views: page._count.pageUrl
       }));
+
+      console.log('✅ 간단 분석: QueryOptimizer 최적화 완료');
+      const endTime = performance.now();
+      console.log(`🎯 간단 분석 로딩 완료: ${(endTime - startTime).toFixed(2)}ms (${totalVisits}개 방문)`);
 
       const analyticsData = {
         period,

@@ -1,6 +1,7 @@
 "use client";
 // src/app/admin/components/BlogViewsChart.tsx - 블로그 조회수 차트 컴포넌트
 import React, { useState, useEffect } from "react";
+import './styles.css';
 
 interface BlogViewsData {
   title: string;
@@ -77,7 +78,7 @@ const BlogViewsChart: React.FC = () => {
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
                   <div 
-                    className="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full transition-all duration-500"
+                    className="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full blog-views-progress"
                     style={{ width: `${percentage}%` }}
                   ></div>
                 </div>

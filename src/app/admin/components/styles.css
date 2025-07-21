@@ -1,0 +1,40 @@
+/* Admin Components Styles */
+
+/* Progress Bars */
+.admin-progress-bar {
+  transition: width 0.3s ease-in-out;
+}
+
+/* Blog Views Chart */
+.blog-views-progress {
+  transition: width 0.5s ease-out;
+}
+
+/* Visitor Stats */
+.visitor-stats-progress {
+  transition: width 0.3s ease-in-out;
+}
+
+/* Traffic Source Chart */
+.traffic-source-progress {
+  transition: width 0.3s ease-in-out;
+}
+
+/* SERP Traffic Chart */
+.serp-traffic-progress {
+  transition: width 0.3s ease-in-out;
+}
+
+/* AI Assistant Animation */
+.ai-assistant-delay-01s {
+  animation-delay: 0.1s;
+}
+
+.ai-assistant-delay-02s {
+  animation-delay: 0.2s;
+}
+
+/* Help Tooltip */
+.help-tooltip {
+  transition: opacity 0.2s ease-in-out;
+} 

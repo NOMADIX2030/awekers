@@ -250,7 +250,7 @@ const BlogNewPage: React.FC = () => {
           <div className="grid grid-cols-4 gap-2 mb-2">
             {unsplashImages.map((url, idx) => (
               <img
-                key={idx}
+                key={url}
                 src={url}
                 alt="미리보기"
                 className={`w-20 h-20 object-cover rounded cursor-pointer border-2 ${image === url ? 'border-blue-500' : 'border-transparent'}`}

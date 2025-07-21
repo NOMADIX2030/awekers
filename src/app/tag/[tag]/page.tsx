@@ -1,5 +1,5 @@
 import React from "react";
-import { prisma } from "@/lib/prisma";
+import prisma from "@/lib/prisma";
 import { Metadata } from "next";
 import TagListClient from "./TagListClient";
 
@@ -43,30 +43,37 @@ export default async function TagPage({ params }: { params: Promise<{ tag: strin
       orderBy: {
         date: "desc",
       },
-      take: 50,
     });
 
+    // 클라이언트 컴포넌트에 데이터 전달
     return (
-      <section className="w-full max-w-3xl mx-auto py-16 px-4 font-pretendard bg-white min-h-screen">
-        <h1 className="text-3xl md:text-4xl font-extrabold mb-10 tracking-tight text-black text-center">
-          # {decodedTag}
-        </h1>
-        {blogs.length === 0 ? (
-          <div className="text-black/50 text-center">해당 태그의 글이 없습니다.</div>
-        ) : (
-          <TagListClient blogs={blogs} />
-        )}
-      </section>
+      <div className="min-h-screen bg-gray-50">
+        <TagListClient 
+          tag={decodedTag} 
+          blogs={blogs} 
+        />
+      </div>
     );
   } catch (error) {
-    console.error('태그 페이지 로딩 오류:', error);
+    console.error("태그 페이지 로딩 오류:", error);
+    
     return (
-      <section className="w-full max-w-3xl mx-auto py-16 px-4 font-pretendard bg-white min-h-screen">
-        <h1 className="text-3xl md:text-4xl font-extrabold mb-10 tracking-tight text-black text-center">
-          # {decodedTag}
-        </h1>
-        <div className="text-red-500 text-center">데이터를 불러오는 중 오류가 발생했습니다.</div>
-      </section>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-800 mb-4">
+            페이지를 불러올 수 없습니다
+          </h1>
+          <p className="text-gray-600 mb-8">
+            잠시 후 다시 시도해주세요.
+          </p>
+          <a 
+            href="/blog" 
+            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            블로그 목록으로 돌아가기
+          </a>
+        </div>
+      </div>
     );
   }
 } 

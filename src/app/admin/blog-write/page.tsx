@@ -351,7 +351,7 @@ const AdminBlogWritePage: React.FC = () => {
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   {unsplashImages.map((url, idx) => (
                     <img
-                      key={idx}
+                      key={url}
                       src={url}
                       alt="미리보기"
                       className={`w-full h-24 object-cover rounded-lg cursor-pointer border-2 transition-colors ${

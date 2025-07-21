@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '../../../../lib/prisma';
+import { NextRequest, NextResponse } from "next/server";
+import prisma from '../../../../lib/prisma';
+import { QueryOptimizer } from '../../../../lib/admin/QueryOptimizer';
 
 export async function GET(request: NextRequest) {
   try {
@@ -71,82 +72,66 @@ export async function GET(request: NextRequest) {
       timeSeries: []
     };
 
-    // 실제 데이터베이스에서 데이터 수집 시도
+    // 🚀 중앙집중식 최적화 적용 (QueryOptimizer 패턴)
+    console.log('🎯 분석 데이터: QueryOptimizer 적용 시작');
+    
+    const startTime = performance.now();
+    
     try {
-      const totalVisits = await prisma.pageVisit.count({
-        where: {
-          createdAt: {
-            gte: startDate
-          }
-        }
+      // 🚀 중앙집중식: 모든 통계 쿼리를 병렬로 실행
+      const statsResult = await QueryOptimizer.getInstance().executeParallel({
+        totalVisits: () => prisma.pageVisit.count({
+          where: { createdAt: { gte: startDate } }
+        }),
+        deviceStats: () => prisma.pageVisit.groupBy({
+          by: ['deviceType'],
+          where: { createdAt: { gte: startDate } },
+          _count: { deviceType: true }
+        }),
+        browserStats: () => prisma.pageVisit.groupBy({
+          by: ['browser'],
+          where: { createdAt: { gte: startDate } },
+          _count: { browser: true }
+        }),
+        topPages: () => prisma.pageVisit.groupBy({
+          by: ['pageTitle', 'pageUrl'],
+          where: { createdAt: { gte: startDate } },
+          _count: { pageTitle: true },
+          orderBy: { _count: { pageTitle: 'desc' } },
+          take: 5
+        })
       });
 
+      const totalVisits = statsResult.totalVisits;
+      
       if (totalVisits > 0) {
-        // 실제 데이터가 있는 경우 통계 계산
-        const deviceStats = await prisma.pageVisit.groupBy({
-          by: ['deviceType'],
-          where: {
-            createdAt: {
-              gte: startDate
-            }
-          },
-          _count: {
-            deviceType: true
-          }
-        });
 
-        const browserStats = await prisma.pageVisit.groupBy({
-          by: ['browser'],
-          where: {
-            createdAt: {
-              gte: startDate
-            }
-          },
-          _count: {
-            browser: true
-          }
-        });
-
-        const topPages = await prisma.pageVisit.groupBy({
-          by: ['pageTitle', 'pageUrl'],
-          where: {
-            createdAt: {
-              gte: startDate
-            }
-          },
-          _count: {
-            pageTitle: true
-          },
-          orderBy: {
-            _count: {
-              pageTitle: 'desc'
-            }
-          },
-          take: 5
-        });
-
-        // 데이터 업데이트
+        // 🚀 중앙집중식 결과 처리
         analyticsData.summary.totalVisits = totalVisits;
         analyticsData.summary.pageViews = totalVisits;
         analyticsData.summary.uniqueVisitors = totalVisits; // 간단히 동일하게 설정
 
-        analyticsData.deviceStats = deviceStats.map((stat: { deviceType: string; _count: { deviceType: number } }) => ({
+        analyticsData.deviceStats = statsResult.deviceStats.map((stat: any) => ({
           device: stat.deviceType,
           count: stat._count.deviceType,
           percentage: Math.round((stat._count.deviceType / totalVisits) * 100)
         }));
 
-        analyticsData.browserStats = browserStats.map((stat: { browser: string; _count: { browser: number } }) => ({
+        analyticsData.browserStats = statsResult.browserStats.map((stat: any) => ({
           browser: stat.browser,
           count: stat._count.browser,
           percentage: Math.round((stat._count.browser / totalVisits) * 100)
         }));
 
-        analyticsData.topPages = topPages.map((page: { pageTitle: string; pageUrl: string; _count: { pageTitle: number } }) => ({
+        analyticsData.topPages = statsResult.topPages.map((page: any) => ({
           title: page.pageTitle,
           url: page.pageUrl,
           views: page._count.pageTitle
         }));
+        
+        console.log('✅ 분석 데이터: QueryOptimizer 최적화 완료');
+        const endTime = performance.now();
+        console.log(`🎯 분석 데이터 로딩 완료: ${(endTime - startTime).toFixed(2)}ms (${totalVisits}개 방문)`);  
       }
     } catch (error) {
       console.error('데이터베이스 조회 오류:', error);

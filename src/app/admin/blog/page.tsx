@@ -32,13 +32,27 @@ const BlogManagement: React.FC = () => {
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
-        const response = await fetch('/api/blog');
+        const response = await fetch('/api/admin/blog', {
+          headers: {
+            'Authorization': 'Bearer admin-key',
+            'Content-Type': 'application/json'
+          }
+        });
         if (response.ok) {
-          const data = await response.json();
-          setBlogs(Array.isArray(data) ? data : (data.blogs || []));
+          const result = await response.json();
+          if (result.success) {
+            setBlogs(result.data.blogs || []);
+          } else {
+            console.error('API 오류:', result.message);
+            setBlogs([]);
+          }
+        } else {
+          console.error('HTTP 오류:', response.status, response.statusText);
+          setBlogs([]);
         }
       } catch (error) {
         console.error('게시글 로드 오류:', error);
+        setBlogs([]);
       } finally {
         setLoading(false);
       }

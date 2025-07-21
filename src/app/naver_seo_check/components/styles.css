@@ -1,0 +1,21 @@
+/* Naver SEO Check Components Styles */
+
+/* Category Result Card */
+.category-card-border {
+  border-left-width: 4px;
+  transition: border-left-color 0.3s ease;
+}
+
+.category-text-color {
+  /* Dynamic color will be applied via CSS custom properties */
+}
+
+/* Loading Screen Progress */
+.naver-loading-progress {
+  transition: width 0.2s ease-in-out;
+}
+
+/* Analysis Result Progress */
+.naver-analysis-progress {
+  transition: width 0.5s ease-out;
+} 

@@ -1,58 +1,89 @@
-import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { NextRequest, NextResponse } from 'next/server';
+import prisma from '@/lib/prisma';
 
-// POST: 댓글 신고
+// 댓글 신고 (POST)
 export async function POST(
-  req: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string; commentId: string }> }
 ) {
   try {
-    const { id: blogId, commentId: commentIdStr } = await params;
+    const { commentId: commentIdStr } = await params;
     const commentId = parseInt(commentIdStr);
-    const { userId, reason } = await req.json();
+    const body = await request.json();
+    const { userId, reason } = body;
 
+    // 입력 검증
     if (isNaN(commentId)) {
-      return NextResponse.json({ error: "유효하지 않은 댓글 ID입니다." }, { status: 400 });
+      return NextResponse.json(
+        { error: '올바르지 않은 댓글 ID입니다.' },
+        { status: 400 }
+      );
     }
 
-    if (!userId) {
-      return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
+    if (!userId || typeof userId !== 'number') {
+      return NextResponse.json(
+        { error: '로그인이 필요합니다.' },
+        { status: 401 }
+      );
     }
 
-    if (!reason || reason.trim().length < 5) {
-      return NextResponse.json({ error: "신고 사유를 5자 이상 입력해주세요." }, { status: 400 });
+    if (!reason || typeof reason !== 'string' || reason.trim().length < 5) {
+      return NextResponse.json(
+        { error: '신고 사유를 5자 이상 입력해주세요.' },
+        { status: 400 }
+      );
+    }
+
+    if (reason.trim().length > 500) {
+      return NextResponse.json(
+        { error: '신고 사유는 500자를 초과할 수 없습니다.' },
+        { status: 400 }
+      );
     }
 
     // 댓글 존재 확인
     const comment = await prisma.comment.findUnique({
-      where: { id: commentId },
-      include: { user: true }
+      where: { id: commentId }
     });
 
     if (!comment) {
-      return NextResponse.json({ error: "존재하지 않는 댓글입니다." }, { status: 404 });
+      return NextResponse.json(
+        { error: '존재하지 않는 댓글입니다.' },
+        { status: 404 }
+      );
     }
 
-    // 본인 댓글에는 신고 불가
+    // 자신의 댓글 신고 방지
     if (comment.userId === userId) {
-      return NextResponse.json({ error: "본인 댓글에는 신고할 수 없습니다." }, { status: 400 });
+      return NextResponse.json(
+        { error: '자신의 댓글은 신고할 수 없습니다.' },
+        { status: 400 }
+      );
     }
 
     // 이미 신고했는지 확인
     const existingReport = await prisma.commentReport.findUnique({
-      where: { commentId_userId: { commentId, userId } }
+      where: {
+        commentId_userId: {
+          commentId,
+          userId
+        }
+      }
     });
 
     if (existingReport) {
-      return NextResponse.json({ error: "이미 신고한 댓글입니다." }, { status: 400 });
+      return NextResponse.json(
+        { error: '이미 신고한 댓글입니다.' },
+        { status: 400 }
+      );
     }
 
     // 신고 추가
     await prisma.commentReport.create({
-      data: { 
-        commentId, 
-        userId, 
-        reason: reason.trim() 
+      data: {
+        commentId,
+        userId,
+        reason: reason.trim()
       }
     });
 
@@ -61,39 +92,25 @@ export async function POST(
       where: { commentId }
     });
 
-    let autoAction = null;
-
-    // 신고 수에 따른 자동 처리
-    if (reportCount >= 10) {
-      // 10개 이상: 즉시 삭제
-      await prisma.$transaction([
-        prisma.commentLike.deleteMany({ where: { commentId } }),
-        prisma.commentReport.deleteMany({ where: { commentId } }),
-        prisma.comment.deleteMany({ where: { id: commentId } })
-      ]);
-      autoAction = "deleted";
-    } else if (reportCount >= 5) {
-      // 5개 이상: 숨김 처리 (관리자 승인 필요)
+    // 3회 이상 신고시 댓글 자동 숨김 처리
+    if (reportCount >= 3) {
       await prisma.comment.update({
         where: { id: commentId },
         data: { isHidden: true }
       });
-      autoAction = "hidden";
     }
 
     return NextResponse.json({ 
-      message: autoAction === "deleted" 
-        ? "댓글이 자동으로 삭제되었습니다." 
-        : autoAction === "hidden"
-        ? "댓글이 숨겨졌습니다. 관리자 검토가 필요합니다."
-        : "댓글이 신고되었습니다.",
+      message: '댓글이 신고되었습니다.',
       reportCount,
-      isReported: true,
-      autoAction
+      isHidden: reportCount >= 3
     });
 
-  } catch (e) {
-    console.error("댓글 신고 오류:", e);
-    return NextResponse.json({ error: "신고 처리 중 오류가 발생했습니다." }, { status: 500 });
+  } catch (error) {
+    console.error('댓글 신고 오류:', error);
+    return NextResponse.json(
+      { error: '신고 처리에 실패했습니다.' },
+      { status: 500 }
+    );
   }
 } 

@@ -1,5 +1,6 @@
 "use client";
 import React from 'react';
+import '../../components/styles.css';
 
 interface TrafficSourceData {
   source: string;
@@ -32,7 +33,7 @@ const TrafficSourceChart: React.FC<TrafficSourceChartProps> = ({ data = [] }) =>
           <div className="flex-1 mx-4">
             <div className="bg-gray-200 rounded-full h-2">
               <div
-                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                className="bg-blue-600 h-2 rounded-full traffic-source-progress"
                 style={{ width: `${source.percentage}%` }}
               />
             </div>

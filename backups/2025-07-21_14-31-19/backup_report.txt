@@ -1,0 +1,155 @@
+=== 현재 상태 백업 시작: Mon Jul 21 14:31:39 KST 2025 ===
+=== 1. 데이터베이스 현재 상태 ===
+백업 시간: Mon Jul 21 14:31:52 KST 2025
+
+{
+  "totalBlogs": 1,
+  "totalComments": 0,
+  "totalUsers": 0,
+  "totalViews": 5,
+  "totalInquiries": 2,
+  "pendingInquiries": 2,
+  "processingInquiries": 0,
+  "completedInquiries": 0
+}
+
+=== 2. 현재 블로그 데이터 ===
+[
+  {
+    "id": 1,
+    "title": "SEO 최적화: 온라인 시장에서 빛을 발하는 방법",
+    "tag": "SEO, 검색 엔진 최적화, 온라인 마케팅, 키워드 연구, 내부 링크 구조",
+    "date": "2025-07-21T05:12:05.505Z",
+    "view": 5
+  }
+]
+
+=== 3. 현재 문의 데이터 ===
+[
+  {
+    "id": 2,
+    "name": "keum sang han",
+    "email": "difm2020@naver.com",
+    "serviceType": "AI 자동화",
+    "status": "PENDING",
+    "createdAt": "2025-07-21T05:18:33.370Z"
+  },
+  {
+    "id": 1,
+    "name": "테스트 사용자",
+    "email": "jake@paradisehike.com",
+    "serviceType": "SEO 캠페인",
+    "status": "PENDING",
+    "createdAt": "2025-07-21T05:00:09.486Z"
+  }
+]
+
+=== 4. Git 상태 ===
+On branch main
+Your branch is up to date with 'origin/main'.
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   README.md
+	modified:   package-lock.json
+	modified:   package.json
+	modified:   prisma/schema.prisma
+	modified:   prisma/seed.ts
+	modified:   src/app/admin/blog-write/page.tsx
+	modified:   src/app/admin/blog/page.tsx
+	modified:   src/app/admin/components/AdminSidebar.tsx
+	modified:   src/app/admin/dashboard/page.tsx
+	modified:   src/app/api/admin/dashboard/route.ts
+	modified:   src/app/blog/[id]/page.tsx
+	modified:   src/app/blog/new/page.tsx
+	modified:   src/app/components/TagFilterBar.tsx
+	modified:   src/app/globals.css
+	modified:   src/app/layout.tsx
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	backup/
+	doc/
+	src/app/admin/inquiries/
+	src/app/admin/menu-management/
+	src/app/ai-automation/
+	src/app/ai-blog/
+	src/app/ai-chatbot/
+	src/app/ai-database/
+	src/app/api/admin/blog/
+	src/app/api/admin/inquiries/
+	src/app/api/admin/menu/
+	src/app/api/admin/submenu/
+	src/app/api/inquiry-check/
+	src/app/api/inquiry/
+	src/app/api/menu/
+	src/app/api/naver-seo-analysis/
+	src/app/api/seo-analysis/
+	src/app/blog/page.tsx
+	src/app/components/BlogCardEnhanced.tsx
+	src/app/components/BlogPageHeader.tsx
+	src/app/components/BlogPageList.tsx
+	src/app/inquiry-check/
+	src/app/inquiry/
+	src/app/naver_seo_check/
+	src/app/seo-campaign/
+	src/app/seo-checker/
+	src/app/website-seo/
+	src/lib/auth.ts
+
+no changes added to commit (use "git add" and/or "git commit -a")
+
+=== 5. Prisma 스키마 상태 ===
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+model Blog {
+  id          Int               @id @default(autoincrement())
+  title       String            @db.VarChar(255)
+  summary     String            @db.Text
+  content     String            @db.Text
+  tag         String            @db.VarChar(255)
+  image       String            @db.Text
+  date        DateTime          @default(now())
+  view        Int               @default(0)
+  comments    Comment[]
+  visits      PageVisit[]
+  performance PagePerformance[]
+
+  // 성능 최적화를 위한 인덱스
+  @@index([tag])
+  @@index([date])
+  @@index([view])
+  @@index([tag, date])
+}
+
+model User {
+  id        Int             @id @default(autoincrement())
+  email     String          @unique
+  password  String
+  isAdmin   Boolean         @default(false)
+  createdAt DateTime        @default(now())
+  comments  Comment[]
+  likes     CommentLike[]
+  reports   CommentReport[]
+  visits    PageVisit[]
+}
+
+/// 사이트 환경설정 테이블
+model SiteSetting {
+  id        Int      @id @default(autoincrement())
+  key       String   @unique
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
+주요 파일들 백업 완료
+원본 댓글 기능 백업 완료

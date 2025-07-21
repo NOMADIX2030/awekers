@@ -1,0 +1,16 @@
+/* AI Database Page Styles */
+
+/* Background Animation Elements */
+.background-animation-spin-12s {
+  animation-duration: 12s;
+}
+
+.background-animation-spin-12s-delay-3s {
+  animation-delay: 3s;
+  animation-duration: 12s;
+}
+
+.background-animation-spin-12s-delay-6s {
+  animation-delay: 6s;
+  animation-duration: 12s;
+} 

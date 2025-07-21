@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import prisma from "@/lib/prisma";
 
 // 모델별 토큰 한도
 const MODEL_TOKEN_LIMITS: Record<string, number> = {

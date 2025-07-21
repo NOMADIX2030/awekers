@@ -1,0 +1,43 @@
+/* SEO Checker Components Styles */
+
+/* Progress Bar Styles */
+.progress-bar {
+  transition: width 0.3s ease-in-out;
+}
+
+/* Score Card Progress */
+.score-progress {
+  transition: width 0.5s ease-out;
+}
+
+/* Images Section Progress */
+.images-progress {
+  transition: width 0.3s ease-in-out;
+}
+
+/* Loading Screen Progress */
+.loading-progress {
+  transition: width 0.2s ease-in-out;
+}
+
+/* SEO Score Histogram */
+.score-histogram-category {
+  /* Dynamic color will be applied via CSS custom properties */
+}
+
+.score-histogram-bar {
+  transition: width 0.5s ease-out;
+}
+
+.score-histogram-tooltip {
+  transition: opacity 0.2s ease-in-out;
+}
+
+/* Animation Delays */
+.animation-delay-01s {
+  animation-delay: 0.1s;
+}
+
+.animation-delay-02s {
+  animation-delay: 0.2s;
+} 

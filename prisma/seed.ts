@@ -3,88 +3,190 @@ import bcrypt from 'bcrypt';
 const prisma = new PrismaClient();
 
 async function main() {
-  // 기존 댓글 데이터 삭제 (새로운 스키마와 호환되지 않음)
-  console.log('기존 댓글 데이터를 삭제합니다...');
-  await prisma.comment.deleteMany({});
-  console.log('기존 댓글 데이터 삭제 완료');
+  console.log('시드 데이터 시작...');
 
-  // 관리자 계정 생성
-  const adminId = process.env.ADMIN_ID;
-  const adminPass = process.env.ADMIN_PASS;
-  if (adminId && adminPass) {
-    const exists = await prisma.user.findUnique({ where: { email: adminId } });
-    if (!exists) {
-      const hash = await bcrypt.hash(adminPass, 10);
-      await prisma.user.create({
-        data: {
-          email: adminId,
-          password: hash,
-          isAdmin: true,
-        },
-      });
-      console.log('관리자 계정이 생성되었습니다:', adminId);
-    } else {
-      console.log('관리자 계정이 이미 존재합니다:', adminId);
+  // 기존 하위메뉴 데이터 삭제 (선택사항)
+  await prisma.subMenu.deleteMany({});
+  
+  // 기존 메뉴 데이터 삭제 (선택사항)
+  await prisma.menu.deleteMany({});
+
+  // 메뉴 데이터 추가
+  const menuData = [
+    {
+      label: "검색엔진최적화",
+      href: "/tag/SEO",
+      order: 1,
+      isActive: true
+    },
+    {
+      label: "홈페이지 제작",
+      href: "/tag/홈페이지제작",
+      order: 2,
+      isActive: true
+    },
+    {
+      label: "AI답변 최적화",
+      href: "/tag/AI답변최적화",
+      order: 3,
+      isActive: true
+    },
+    {
+      label: "AI앱 개발",
+      href: "/tag/AI앱개발",
+      order: 4,
+      isActive: true
+    },
+    {
+      label: "서비스",
+      href: "/services",
+      order: 5,
+      isActive: true
+    },
+    {
+      label: "블로그",
+      href: "/blog",
+      order: 6,
+      isActive: true
+    },
+    {
+      label: "문의하기",
+      href: "/inquiry",
+      order: 7,
+      isActive: true
     }
-  } else {
-    console.log('ADMIN_ID, ADMIN_PASS 환경변수를 .env에 설정하세요.');
-  }
+  ];
 
-  // 일반 사용자 계정 생성 (테스트용)
-  const testUserEmail = 'user@example.com';
-  const testUserPass = 'password123';
-  const testUserExists = await prisma.user.findUnique({ where: { email: testUserEmail } });
-  if (!testUserExists) {
-    const hash = await bcrypt.hash(testUserPass, 10);
-    await prisma.user.create({
-      data: {
-        email: testUserEmail,
-        password: hash,
-        isAdmin: false,
-      },
+  const createdMenus = [];
+  for (const menu of menuData) {
+    const createdMenu = await prisma.menu.create({
+      data: menu
     });
-    console.log('테스트 사용자 계정이 생성되었습니다:', testUserEmail);
-  } else {
-    console.log('테스트 사용자 계정이 이미 존재합니다:', testUserEmail);
+    createdMenus.push(createdMenu);
+    console.log(`메뉴 생성됨: ${menu.label}`);
   }
 
-  await prisma.blog.createMany({
-    data: [
-      {
-        title: "Next.js로 만드는 트렌디한 웹사이트",
-        summary: "최신 Next.js와 TailwindCSS로 빠르고 세련된 웹사이트를 만드는 방법을 소개합니다.",
-        content: `Next.js와 TailwindCSS를 활용하면 빠르고 트렌디한 웹사이트를 손쉽게 만들 수 있습니다.\n\n1. 프로젝트 초기화\n2. 컴포넌트 설계\n3. 반응형 스타일 적용\n4. 배포까지 한 번에!`,
-        tag: "Next.js",
-        image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=600&q=80",
-        date: new Date("2024-07-01"),
-      },
-      {
-        title: "디자인 시스템 구축 가이드",
-        summary: "일관된 UI/UX를 위한 디자인 시스템 설계와 도입 노하우를 공유합니다.",
-        content: `디자인 시스템은 일관된 UI/UX를 제공하는 핵심입니다.\n\n- 컴포넌트 재사용\n- 컬러/타이포/스페이싱 토큰 관리\n- 문서화와 협업 프로세스 정립`,
-        tag: "Design",
-        image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80",
-        date: new Date("2024-06-25"),
-      },
-      {
-        title: "프론트엔드 개발 생산성 툴 TOP 5",
-        summary: "개발 속도를 높여주는 필수 프론트엔드 툴과 활용법을 정리했습니다.",
-        content: `생산성을 높여주는 툴\n\n1. VSCode\n2. Figma\n3. Storybook\n4. GitHub Copilot\n5. Prettier/ESLint`,
-        tag: "Productivity",
-        image: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=600&q=80",
-        date: new Date("2024-06-20"),
-      },
-      {
-        title: "AI와 웹개발의 미래",
-        summary: "AI 기술이 웹개발에 미치는 영향과 앞으로의 트렌드를 전망합니다.",
-        content: `AI는 웹개발의 많은 부분을 자동화하고 있습니다.\n\n- 코드 생성\n- 디자인 자동화\n- 사용자 맞춤형 경험\n\n앞으로의 웹은 AI와 더욱 밀접하게 연결될 것입니다.`,
-        tag: "AI",
-        image: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=600&q=80",
-        date: new Date("2024-06-10"),
-      },
-    ],
-    skipDuplicates: true,
-  });
+  // 하위메뉴 데이터 추가
+  const subMenuData = [
+    // 검색엔진최적화 하위메뉴
+    {
+      parentMenuId: createdMenus[0].id, // 검색엔진최적화
+      label: "포트폴리오",
+      href: "/tag/포트폴리오",
+      icon: "📁",
+      order: 1,
+      isActive: true
+    },
+    {
+      parentMenuId: createdMenus[0].id,
+      label: "검색엔진최적화 소개",
+      href: "/tag/SEO소개",
+      icon: "🔍",
+      order: 2,
+      isActive: true
+    },
+    {
+      parentMenuId: createdMenus[0].id,
+      label: "검색엔진최적화 진행과정",
+      href: "/tag/SEO진행과정",
+      icon: "🔄",
+      order: 3,
+      isActive: true
+    },
+    {
+      parentMenuId: createdMenus[0].id,
+      label: "검색엔진최적화 적용효과",
+      href: "/tag/SEO효과",
+      icon: "📈",
+      order: 4,
+      isActive: true
+    },
+    {
+      parentMenuId: createdMenus[0].id,
+      label: "검색엔진최적화란?",
+      href: "/tag/SEO정의",
+      icon: "❓",
+      order: 5,
+      isActive: true
+    },
+
+    // 홈페이지 제작 하위메뉴
+    {
+      parentMenuId: createdMenus[1].id, // 홈페이지 제작
+      label: "포트폴리오",
+      href: "/tag/포트폴리오",
+      icon: "📁",
+      order: 1,
+      isActive: true
+    },
+    {
+      parentMenuId: createdMenus[1].id,
+      label: "홈페이지 제작방법",
+      href: "/tag/홈페이지제작방법",
+      icon: "⚙️",
+      order: 2,
+      isActive: true
+    },
+    {
+      parentMenuId: createdMenus[1].id,
+      label: "홈페이지 제작혜택",
+      href: "/tag/홈페이지제작혜택",
+      icon: "📦",
+      order: 3,
+      isActive: true
+    },
+    {
+      parentMenuId: createdMenus[1].id,
+      label: "홈페이지 제작과정",
+      href: "/tag/홈페이지제작과정",
+      icon: "🔄",
+      order: 4,
+      isActive: true
+    },
+
+    // 서비스 하위메뉴
+    {
+      parentMenuId: createdMenus[4].id, // 서비스
+      label: "SEO 점수 Checker",
+      href: "/seo-checker",
+      icon: "🔍",
+      order: 1,
+      isActive: true
+    },
+    {
+      parentMenuId: createdMenus[4].id,
+      label: "웹사이트 분석",
+      href: "/website-analysis",
+      icon: "📊",
+      order: 2,
+      isActive: true
+    },
+    {
+      parentMenuId: createdMenus[4].id,
+      label: "성능 최적화",
+      href: "/performance-optimization",
+      icon: "⚡",
+      order: 3,
+      isActive: true
+    },
+    {
+      parentMenuId: createdMenus[4].id,
+      label: "SEO 컨설팅",
+      href: "/seo-consulting",
+      icon: "💼",
+      order: 4,
+      isActive: true
+    }
+  ];
+
+  for (const subMenu of subMenuData) {
+    await prisma.subMenu.create({
+      data: subMenu
+    });
+    console.log(`하위메뉴 생성됨: ${subMenu.label}`);
+  }
+
+  console.log('시드 데이터 완료!');
 }
 
 main()

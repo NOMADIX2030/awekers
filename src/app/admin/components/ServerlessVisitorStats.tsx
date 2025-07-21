@@ -1,6 +1,7 @@
 "use client";
 // src/app/admin/components/ServerlessVisitorStats.tsx - 서버리스 최적화 접속자 통계
 import React, { useState, useEffect } from "react";
+import './styles.css';
 
 interface AnalyticsData {
   period: string;
@@ -206,7 +207,7 @@ const ServerlessVisitorStats: React.FC = () => {
                   <div className="flex items-center">
                     <div className="w-24 bg-gray-200 rounded-full h-2 mr-2">
                       <div 
-                        className="bg-blue-600 h-2 rounded-full transition-all duration-500"
+                        className="bg-blue-600 h-2 rounded-full admin-progress-bar"
                         style={{ width: `${stat.percentage}%` }}
                       ></div>
                     </div>
@@ -230,7 +231,7 @@ const ServerlessVisitorStats: React.FC = () => {
                   <div className="flex items-center">
                     <div className="w-24 bg-gray-200 rounded-full h-2 mr-2">
                       <div 
-                        className="bg-green-600 h-2 rounded-full transition-all duration-500"
+                        className="bg-green-600 h-2 rounded-full admin-progress-bar"
                         style={{ width: `${stat.percentage}%` }}
                       ></div>
                     </div>

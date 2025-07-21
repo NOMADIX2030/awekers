@@ -24,8 +24,8 @@ const AdminCard: React.FC<AdminCardProps> = ({
     lg: 'p-6 sm:p-8'
   };
 
-  const baseClasses = `bg-white rounded-xl shadow-sm border border-gray-200 ${paddingClasses[padding]} ${className}`;
-  const interactiveClasses = onClick ? 'cursor-pointer hover:shadow-md transition-shadow' : '';
+  const baseClasses = `bg-white rounded-xl border border-gray-200 ${paddingClasses[padding]} ${className}`;
+  const interactiveClasses = onClick ? 'cursor-pointer hover:border-gray-300 transition-colors' : '';
 
   return (
     <div 
@@ -68,7 +68,7 @@ export const StatCard: React.FC<StatCardProps> = ({
   className = '' 
 }) => {
   return (
-    <div className={`bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 ${className}`}>
+    <div className={`bg-white rounded-xl border border-gray-200 p-4 sm:p-6 ${className}`}>
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm font-medium text-gray-600 mb-1">{title}</p>

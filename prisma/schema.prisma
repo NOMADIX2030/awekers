@@ -21,7 +21,13 @@ model Blog {
   visits      PageVisit[]
   performance PagePerformance[]
 
-  // 성능 최적화를 위한 인덱스
+  // 🚀 극한 성능 최적화 인덱스 (count, aggregate 쿼리 최적화)
+  @@index([id, date]) // Primary 조건 최적화
+  @@index([view, date]) // 인기글 조회 최적화 (ORDER BY view DESC)
+  @@index([date, view]) // 날짜순 + 조회수 복합 최적화
+  @@index([tag, date, view]) // 태그별 인기글 최적화
+  
+  // 기존 인덱스 (유지)
   @@index([tag])
   @@index([date])
   @@index([view])
@@ -38,6 +44,12 @@ model User {
   likes     CommentLike[]
   reports   CommentReport[]
   visits    PageVisit[]
+  
+  // 🚀 극한 성능 최적화 인덱스 (count 쿼리 대폭 최적화)
+  @@index([id, createdAt]) // Primary 조건 최적화
+  @@index([createdAt]) // 가입일순 조회 최적화
+  @@index([isAdmin, createdAt]) // 관리자별 + 가입일순 최적화
+  @@index([createdAt, isAdmin]) // 최신 사용자 + 권한별 복합 최적화
 }
 
 /// 사이트 환경설정 테이블
@@ -46,6 +58,58 @@ model SiteSetting {
   key       String   @unique
   value     String
   updatedAt DateTime @updatedAt
+}
+
+/// 권한 레벨 enum
+enum VisibilityLevel {
+  GUEST  // 일반방문자 (비로그인)
+  USER   // 일반회원 (로그인)
+  ADMIN  // 관리자
+}
+
+/// 메뉴 관리 테이블
+model Menu {
+  id              Int             @id @default(autoincrement())
+  label           String          @db.VarChar(100)  // 메뉴 표시명
+  href            String          @db.VarChar(255)  // 링크 URL
+  order           Int             @default(0)       // 정렬 순서
+  isActive        Boolean         @default(true)    // 활성화 여부
+  visibilityLevel VisibilityLevel @default(GUEST)   // 권한별 노출 설정
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  // 하위메뉴와의 관계
+  subMenus        SubMenu[]
+
+  // 성능 최적화를 위한 인덱스
+  @@index([order])
+  @@index([isActive])
+  @@index([visibilityLevel])
+  @@index([isActive, visibilityLevel, order])
+}
+
+/// 하위메뉴 관리 테이블
+model SubMenu {
+  id              Int             @id @default(autoincrement())
+  parentMenuId    Int                                 // 상위 메뉴 ID
+  label           String          @db.VarChar(100)    // 하위메뉴 표시명
+  href            String          @db.VarChar(255)    // 링크 URL
+  icon            String?         @db.VarChar(50)     // 아이콘 (선택사항)
+  order           Int             @default(0)         // 정렬 순서
+  isActive        Boolean         @default(true)      // 활성화 여부
+  visibilityLevel VisibilityLevel @default(GUEST)     // 권한별 노출 설정
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  // 상위 메뉴와의 관계
+  parentMenu      Menu            @relation(fields: [parentMenuId], references: [id], onDelete: Cascade)
+
+  // 성능 최적화를 위한 인덱스
+  @@index([parentMenuId])
+  @@index([order])
+  @@index([isActive])
+  @@index([visibilityLevel])
+  @@index([parentMenuId, isActive, visibilityLevel, order])
 }
 
 model Comment {
@@ -63,6 +127,20 @@ model Comment {
   replies   Comment[]       @relation("CommentToReplies")
   likes     CommentLike[]
   reports   CommentReport[]
+
+  // 🚀 극한 성능 최적화 인덱스 (중복 제거 및 통합 최적화)
+  @@index([id, createdAt]) // Primary 조건 최적화
+  @@index([isHidden, createdAt]) // 대시보드 댓글 조회 최적화 (WHERE isHidden = false ORDER BY createdAt DESC)
+  @@index([userId, createdAt]) // 사용자별 댓글 조회 최적화
+  @@index([createdAt, isHidden, userId]) // 시간순 + 공개 여부 + 사용자 복합 최적화
+  @@index([blogId, isHidden, createdAt]) // 블로그별 공개 댓글 최적화 (통합, 중복 제거)
+  
+  // 기본 단일 컬럼 인덱스 (필수 유지)
+  @@index([blogId])
+  @@index([userId])
+  @@index([createdAt])
+  @@index([parentId])
+  @@index([isHidden])
 }
 
 model CommentLike {
@@ -74,6 +152,7 @@ model CommentLike {
   user      User     @relation(fields: [userId], references: [id])
 
   @@unique([commentId, userId])
+  @@index([createdAt])
 }
 
 model CommentReport {
@@ -86,6 +165,8 @@ model CommentReport {
   user      User     @relation(fields: [userId], references: [id])
 
   @@unique([commentId, userId])
+  @@index([createdAt])
+  @@index([reason])
 }
 
 /// 접속자 통계를 위한 모델들
@@ -106,6 +187,16 @@ model PageVisit {
   createdAt  DateTime @default(now())
   user       User?    @relation(fields: [userId], references: [id])
   blog       Blog?    @relation(fields: [blogId], references: [id])
+
+  // 🚀 성능 최적화를 위한 인덱스
+  @@index([createdAt])
+  @@index([blogId])
+  @@index([userId])
+  @@index([pageUrl])
+  @@index([deviceType])
+  @@index([country])
+  @@index([blogId, createdAt])
+  @@index([pageUrl, createdAt])
 }
 
 model DailyStats {
@@ -118,6 +209,10 @@ model DailyStats {
   avgSessionDuration Int      @default(0)
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
+
+  // 🚀 성능 최적화를 위한 인덱스
+  @@index([date])
+  @@index([createdAt])
 }
 
 model HourlyStats {
@@ -129,6 +224,9 @@ model HourlyStats {
   createdAt DateTime @default(now())
 
   @@unique([date, hour])
+  @@index([date])
+  @@index([hour])
+  @@index([createdAt])
 }
 
 /// SERP 분석을 위한 모델들
@@ -144,6 +242,10 @@ model TrafficSource {
   createdAt          DateTime @default(now())
 
   @@unique([date, source, medium])
+  @@index([date])
+  @@index([source])
+  @@index([medium])
+  @@index([createdAt])
 }
 
 model SearchKeyword {
@@ -159,6 +261,10 @@ model SearchKeyword {
   createdAt   DateTime @default(now())
 
   @@unique([date, keyword, source])
+  @@index([date])
+  @@index([keyword])
+  @@index([source])
+  @@index([createdAt])
 }
 
 model PagePerformance {
@@ -176,6 +282,10 @@ model PagePerformance {
   blog          Blog?    @relation(fields: [blogId], references: [id])
 
   @@unique([date, pageUrl])
+  @@index([date])
+  @@index([pageUrl])
+  @@index([blogId])
+  @@index([createdAt])
 }
 
 model SERPInsights {
@@ -188,6 +298,10 @@ model SERPInsights {
   createdAt DateTime @default(now())
 
   @@unique([date, metric, period])
+  @@index([date])
+  @@index([metric])
+  @@index([period])
+  @@index([createdAt])
 }
 
 /// Google Analytics 설정
@@ -202,4 +316,80 @@ model GoogleAnalyticsConfig {
   isActive     Boolean   @default(false)
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
+}
+
+/// 문의 상태 enum
+enum InquiryStatus {
+  PENDING    // 대기중
+  PROCESSING // 처리중
+  COMPLETED  // 완료
+  CANCELLED  // 취소
+}
+
+/// 대응 유형 enum
+enum ResponseType {
+  RESPONSE       // 고객 답변
+  STATUS_CHANGE  // 상태 변경
+  INTERNAL_MEMO  // 내부 메모
+}
+
+/// 문의하기 테이블
+model Inquiry {
+  id           Int           @id @default(autoincrement())
+  referenceNo  String        @unique @db.VarChar(50)  // 고객용 참조번호 (예: AWE-2025-000123)
+  serviceType  String        @db.VarChar(100)  // 원하는 서비스
+  name         String        @db.VarChar(100)  // 이름
+  phone        String        @db.VarChar(50)   // 연락처
+  email        String        @db.VarChar(255)  // 이메일
+  company      String?       @db.VarChar(255)  // 회사명 (선택)
+  industry     String        @db.VarChar(100)  // 업종
+  category     String        @db.VarChar(100)  // 문의 1차 카테고리
+  subcategory  String?       @db.VarChar(100)  // 세부항목
+  budget       String?       @db.VarChar(100)  // 예산
+  message      String        @db.Text          // 상세 문의 내용
+  status       InquiryStatus @default(PENDING) // 처리 상태
+  adminResponse String?      @db.Text          // 관리자 답변 (레거시)
+  ipAddress    String        @db.VarChar(45)   // IP 주소
+  userAgent    String        @db.Text          // User Agent
+  createdAt    DateTime      @default(now())   // 문의 일시
+  updatedAt    DateTime      @updatedAt        // 업데이트 일시
+
+  // 대응 히스토리와의 관계
+  responses    InquiryResponse[]
+
+  // 🚀 극한 성능 최적화 인덱스 (count, groupBy, findMany 쿼리 대폭 최적화)
+  @@index([id, createdAt]) // Primary 조건 최적화
+  @@index([status, createdAt]) // 상태별 최근 문의 최적화 (GROUP BY status + ORDER BY createdAt)
+  @@index([createdAt, status]) // 최근 문의 + 상태별 복합 최적화
+  @@index([serviceType, status, createdAt]) // 서비스별 + 상태별 + 시간순 복합 최적화
+  @@index([createdAt, serviceType, status]) // 대시보드 최적화 (ORDER BY createdAt DESC)
+  
+  // 기존 성능 최적화 인덱스 (유지)
+  @@index([serviceType])
+  @@index([status])
+  @@index([createdAt])
+  @@index([email])
+  @@index([referenceNo])
+}
+
+/// 문의 대응 히스토리 테이블
+model InquiryResponse {
+  id              Int          @id @default(autoincrement())
+  inquiryId       Int                              // 문의 ID
+  adminId         String       @db.VarChar(100)    // 담당자 ID (로그인 계정)
+  adminName       String       @db.VarChar(100)    // 담당자 이름
+  responseType    ResponseType @default(RESPONSE)  // 대응 유형
+  content         String       @db.Text            // 대응 내용
+  isVisibleToCustomer Boolean  @default(true)      // 고객 노출 여부
+  createdAt       DateTime     @default(now())     // 대응 시간
+
+  // 문의와의 관계
+  inquiry         Inquiry      @relation(fields: [inquiryId], references: [id], onDelete: Cascade)
+
+  // 성능 최적화를 위한 인덱스
+  @@index([inquiryId])
+  @@index([createdAt])
+  @@index([adminId])
+  @@index([responseType])
+  @@index([inquiryId, createdAt])
 }

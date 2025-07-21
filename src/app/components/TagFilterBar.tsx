@@ -4,11 +4,15 @@ import React from "react";
 interface TagFilterBarProps {
   onTagSelect: (tag: string) => void;
   selectedTag: string;
+  customTags?: string[];
 }
 
-const TagFilterBar: React.FC<TagFilterBarProps> = ({ onTagSelect, selectedTag }) => {
+const TagFilterBar: React.FC<TagFilterBarProps> = ({ onTagSelect, selectedTag, customTags }) => {
   // 정적 태그 목록 (성능 최적화)
   const staticTags = ["SEO", "백링크", "검색엔진최적화", "구글SEO", "네이버"];
+  
+  // 커스텀 태그가 있으면 사용, 없으면 정적 태그 사용
+  const displayTags = customTags && customTags.length > 0 ? customTags : staticTags;
 
   return (
     <div className="w-full flex flex-col gap-6 mb-6">
@@ -18,7 +22,7 @@ const TagFilterBar: React.FC<TagFilterBarProps> = ({ onTagSelect, selectedTag })
           <span role="img" aria-label="인기">🔥</span> 인기 태그
         </div>
         <div className="flex flex-wrap gap-2 justify-start py-2">
-          {staticTags.slice(0, 3).map((tag) => (
+          {displayTags.slice(0, 3).map((tag) => (
             <button
               key={tag}
               className={`flex items-center gap-1 px-4 py-2 rounded-xl bg-gray-100 hover:bg-black transition text-base font-semibold hover:text-white border border-transparent ${selectedTag === tag ? 'bg-black text-white border-black' : 'text-black'}`}
@@ -36,7 +40,7 @@ const TagFilterBar: React.FC<TagFilterBarProps> = ({ onTagSelect, selectedTag })
           <span role="img" aria-label="최신">🆕</span> 최신 태그
         </div>
         <div className="flex flex-wrap gap-2 justify-start py-2">
-          {staticTags.slice(3, 5).map((tag) => (
+          {displayTags.slice(3, 5).map((tag) => (
             <button
               key={tag}
               className={`flex items-center gap-1 px-4 py-2 rounded-xl bg-gray-100 hover:bg-black transition text-base font-semibold hover:text-white border border-transparent ${selectedTag === tag ? 'bg-black text-white border-black' : 'text-black'}`}

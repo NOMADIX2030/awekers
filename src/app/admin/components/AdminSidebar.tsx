@@ -34,13 +34,25 @@ const navigation: NavItem[] = [
     name: "사용자 관리",
     href: "/admin/users",
     icon: "👥",
-    description: "사용자 계정 관리"
+        description: "사용자 계정 관리"
   },
   {
     name: "댓글 관리",
     href: "/admin/comments",
     icon: "💬",
-    description: "댓글 모더레이션"
+    description: "댓글 모더레이션 및 관리"
+  },
+  {
+    name: "문의 관리",
+    href: "/admin/inquiries",
+    icon: "📞",
+    description: "고객 문의 및 상담 관리"
+  },
+  {
+    name: "메뉴관리",
+    href: "/admin/menu-management",
+    icon: "📋",
+    description: "헤더 메뉴 관리"
   },
   {
     name: "SERP 분석",

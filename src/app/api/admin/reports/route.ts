@@ -1,28 +1,32 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import prisma from "../../../../lib/prisma";
+import { QueryOptimizer } from '../../../../lib/admin/QueryOptimizer';
 
-// GET: 신고된 댓글 목록 조회
+// GET: 신고된 댓글 목록 조회 (중앙집중식)
 export async function GET(req: NextRequest) {
+  const startTime = performance.now();
+  
   try {
     const { searchParams } = new URL(req.url);
     const status = searchParams.get('status') || 'all'; // all, hidden, visible
     
-    // 모든 댓글을 가져와서 신고 수가 3개 이상인 것만 필터링
-    const allComments = await prisma.comment.findMany({
-      include: {
-        user: {
+    // 🚀 중앙집중식 최적화 적용 (N+1 쿼리 문제 해결)
+    console.log('🎯 신고 관리: QueryOptimizer 적용 시작 (N+1 해결)');
+    
+    // 🚀 중앙집중식: Application-level JOIN으로 N+1 문제 해결
+    const reportsData = await QueryOptimizer.getInstance().executeWithApplicationJoin(
+      // 메인 쿼리: 신고 수가 3개 이상인 댓글들만
+      () => prisma.comment.findMany({
+        where: {
+          reports: { some: {} } // 신고가 있는 댓글들만
+        },
           select: {
             id: true,
-            email: true,
-            isAdmin: true
-          }
-        },
-        blog: {
-          select: {
-            id: true,
-            title: true
-          }
-        },
+          content: true,
+          isHidden: true,
+          createdAt: true,
+          userId: true,
+          blogId: true,
         _count: {
           select: {
             reports: true,
@@ -30,28 +34,47 @@ export async function GET(req: NextRequest) {
           }
         }
       },
-      orderBy: {
-        createdAt: 'desc'
+        orderBy: { createdAt: 'desc' }
+      }),
+      // 관계 설정: 애플리케이션에서 조인
+      {
+        user: {
+          foreignKey: 'userId',
+          joinQuery: (userIds: any[]) => 
+            prisma.user.findMany({
+              where: { id: { in: userIds } },
+              select: { id: true, email: true, isAdmin: true }
+            }),
+          mapTo: 'user'
+        },
+        blog: {
+          foreignKey: 'blogId',
+          joinQuery: (blogIds: any[]) =>
+            prisma.blog.findMany({
+              where: { id: { in: blogIds } },
+              select: { id: true, title: true }
+            }),
+          mapTo: 'blog'
+        }
       }
-    });
+    );
 
-    // 신고 수가 3개 이상인 댓글만 필터링
-    let commentsWithReports = allComments.filter(comment => 
+    // 신고 수가 3개 이상이고 사용자가 존재하는 댓글만 필터링
+    let commentsWithReports = reportsData.filter((comment: any) => 
       comment._count.reports >= 3 && comment.user !== null
     );
 
     // 상태별 필터링
     if (status === 'hidden') {
-      commentsWithReports = commentsWithReports.filter(comment => comment.isHidden);
+      commentsWithReports = commentsWithReports.filter((comment: any) => comment.isHidden);
     } else if (status === 'visible') {
-      commentsWithReports = commentsWithReports.filter(comment => !comment.isHidden);
+      commentsWithReports = commentsWithReports.filter((comment: any) => !comment.isHidden);
     }
 
-    // 각 댓글의 신고 내역을 별도로 가져오기
-    const reports = await Promise.all(
-      commentsWithReports.map(async (comment) => {
-        const commentReports = await prisma.commentReport.findMany({
-          where: { commentId: comment.id },
+    // 🚀 중앙집중식: 모든 신고 데이터를 한 번에 조회 (N+1 해결)
+    const commentIds = commentsWithReports.map((comment: any) => comment.id);
+    const allReports = commentIds.length > 0 ? await prisma.commentReport.findMany({
+      where: { commentId: { in: commentIds } },
           include: {
             user: {
               select: {
@@ -60,10 +83,12 @@ export async function GET(req: NextRequest) {
               }
             }
           },
-          orderBy: {
-            createdAt: 'desc'
-          }
-        });
+      orderBy: { createdAt: 'desc' }
+    }) : [];
+
+    // 애플리케이션 레벨에서 신고 데이터 조인
+    const reports = commentsWithReports.map((comment: any) => {
+      const commentReports = allReports.filter(report => report.commentId === comment.id);
 
         return {
           id: comment.id,
@@ -82,8 +107,11 @@ export async function GET(req: NextRequest) {
             user: report.user
           }))
         };
-      })
-    );
+    });
+    
+    console.log('✅ 신고 관리: QueryOptimizer 최적화 완료 (N+1 해결)');
+    const endTime = performance.now();
+    console.log(`🎯 신고 관리 로딩 완료: ${(endTime - startTime).toFixed(2)}ms (${reports.length}개 신고)`);
 
     return NextResponse.json({ 
       reports,

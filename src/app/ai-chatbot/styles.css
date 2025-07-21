@@ -1,0 +1,25 @@
+/* AI Chatbot Page Styles */
+
+/* Background Animation Elements */
+.background-animation-bounce-3s {
+  animation-duration: 3s;
+}
+
+.background-animation-bounce-3s-delay-1s {
+  animation-delay: 1s;
+  animation-duration: 3s;
+}
+
+.background-animation-bounce-3s-delay-2s {
+  animation-delay: 2s;
+  animation-duration: 3s;
+}
+
+/* Chat Animation Elements */
+.chat-animation-delay-01s {
+  animation-delay: 0.1s;
+}
+
+.chat-animation-delay-02s {
+  animation-delay: 0.2s;
+} 

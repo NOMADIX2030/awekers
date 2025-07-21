@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useRef, useEffect } from 'react';
+import './styles.css';
 
 interface Message {
   id: string;
@@ -179,8 +180,8 @@ const AIAssistant: React.FC<AIAssistantProps> = ({ isOpen, onClose }) => {
                 <div className="bg-gray-100 text-gray-900 px-4 py-3 rounded-lg">
                   <div className="flex space-x-1">
                     <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce ai-assistant-delay-01s"></div>
+                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce ai-assistant-delay-02s"></div>
                   </div>
                 </div>
               </div>
@@ -287,8 +288,8 @@ const AIAssistant: React.FC<AIAssistantProps> = ({ isOpen, onClose }) => {
                 <div className="bg-gray-100 text-gray-900 px-3 py-2 rounded-lg">
                   <div className="flex space-x-1">
                     <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce ai-assistant-delay-01s"></div>
+                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce ai-assistant-delay-02s"></div>
                   </div>
                 </div>
               </div>

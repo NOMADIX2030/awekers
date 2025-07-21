@@ -1,0 +1,10 @@
+/* AI Blog Page Styles */
+
+/* Background Animation Elements */
+.background-animation-pulse-delay-1s {
+  animation-delay: 1s;
+}
+
+.background-animation-pulse-delay-2s {
+  animation-delay: 2s;
+} 

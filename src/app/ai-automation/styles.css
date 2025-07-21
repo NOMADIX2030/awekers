@@ -1,0 +1,29 @@
+/* AI Automation Page Styles */
+
+/* Background Animation Elements */
+.background-animation-spin-8s {
+  animation-duration: 8s;
+}
+
+.background-animation-spin-8s-delay-2s {
+  animation-delay: 2s;
+  animation-duration: 8s;
+}
+
+.background-animation-spin-8s-delay-4s {
+  animation-delay: 4s;
+  animation-duration: 8s;
+}
+
+/* Document Generation Animation */
+.document-animation-delay-0s {
+  animation-delay: 0s;
+}
+
+.document-animation-delay-01s {
+  animation-delay: 0.1s;
+}
+
+.document-animation-delay-02s {
+  animation-delay: 0.2s;
+} 

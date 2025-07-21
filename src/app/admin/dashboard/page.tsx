@@ -20,7 +20,7 @@ const RecentItem: React.FC<{
     <div className="px-4 sm:px-6 lg:px-8 py-4 hover:bg-gray-50 transition-colors">
       <div className="flex items-start space-x-3">
         {showRank && rank && (
-          <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
+          <div className="flex-shrink-0 w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center">
             <span className="text-white font-bold text-sm">{rank}</span>
           </div>
         )}
@@ -52,6 +52,10 @@ const AdminDashboardPage: React.FC = () => {
       totalComments: number;
       totalViews: number;
       totalUsers: number;
+      totalInquiries?: number;
+      pendingInquiries?: number;
+      processingInquiries?: number;
+      completedInquiries?: number;
     };
     recentPosts?: Array<{
       id: number;
@@ -64,6 +68,13 @@ const AdminDashboardPage: React.FC = () => {
       content: string;
       date: string;
       user?: { email: string };
+    }>;
+    recentInquiries?: Array<{
+      id: number;
+      name: string;
+      serviceType: string;
+      date: string;
+      status: string;
     }>;
   } | null>(null);
   const [loading, setLoading] = useState(true);
@@ -82,6 +93,9 @@ const AdminDashboardPage: React.FC = () => {
   // 대시보드 데이터 fetch
   useEffect(() => {
     const fetchDashboardData = async () => {
+      const startTime = performance.now();
+      console.log('🎯 프론트엔드: 대시보드 로딩 시작');
+      
       try {
         const res = await fetch("/api/admin/dashboard", {
           headers: {
@@ -91,12 +105,16 @@ const AdminDashboardPage: React.FC = () => {
         if (res.ok) {
           const data = await res.json();
           setDashboardData(data);
+          const endTime = performance.now();
+          console.log(`✅ 프론트엔드: 대시보드 로딩 완료 - ${(endTime - startTime).toFixed(2)}ms`);
         } else {
           console.error("대시보드 API 응답 오류:", res.status);
         }
       } catch (error) {
         console.error("대시보드 데이터 로딩 오류:", error);
       } finally {
+        const endTime = performance.now();
+        console.log(`🏁 프론트엔드: 로딩 상태 해제 - 총 ${(endTime - startTime).toFixed(2)}ms`);
         setLoading(false);
       }
     };
@@ -174,6 +192,32 @@ const AdminDashboardPage: React.FC = () => {
         </AdminGrid>
       </AdminSection>
 
+      {/* 문의 통계 카드 */}
+      <AdminSection title="문의 현황">
+        <AdminGrid cols={4}>
+          <StatCard
+            title="전체 문의"
+            value={dashboardData.stats?.totalInquiries || 0}
+            icon="📞"
+          />
+          <StatCard
+            title="대기 중"
+            value={dashboardData.stats?.pendingInquiries || 0}
+            icon="⏳"
+          />
+          <StatCard
+            title="처리 중"
+            value={dashboardData.stats?.processingInquiries || 0}
+            icon="🔄"
+          />
+          <StatCard
+            title="완료"
+            value={dashboardData.stats?.completedInquiries || 0}
+            icon="✅"
+          />
+        </AdminGrid>
+      </AdminSection>
+
       {/* 관리 기능 */}
       <AdminSection 
         title="관리 기능" 
@@ -183,7 +227,7 @@ const AdminDashboardPage: React.FC = () => {
           <AdminCard 
             title="게시글 관리" 
             description="블로그 게시글을 관리합니다"
-            className="hover:shadow-md transition-shadow cursor-pointer"
+            className="hover:border-gray-300 transition-colors cursor-pointer"
             onClick={() => router.push('/admin/blog')}
           >
             <div className="text-center py-4">
@@ -195,7 +239,7 @@ const AdminDashboardPage: React.FC = () => {
           <AdminCard 
             title="사용자 관리" 
             description="사용자 계정을 관리합니다"
-            className="hover:shadow-md transition-shadow cursor-pointer"
+            className="hover:border-gray-300 transition-colors cursor-pointer"
             onClick={() => router.push('/admin/users')}
           >
             <div className="text-center py-4">
@@ -207,7 +251,7 @@ const AdminDashboardPage: React.FC = () => {
           <AdminCard 
             title="사이트 설정" 
             description="사이트 기본 설정을 관리합니다"
-            className="hover:shadow-md transition-shadow cursor-pointer"
+            className="hover:border-gray-300 transition-colors cursor-pointer"
             onClick={() => router.push('/admin/site-settings')}
           >
             <div className="text-center py-4">
@@ -219,7 +263,7 @@ const AdminDashboardPage: React.FC = () => {
           <AdminCard 
             title="AI 설정" 
             description="AI 기능 설정을 관리합니다"
-            className="hover:shadow-md transition-shadow cursor-pointer"
+            className="hover:border-gray-300 transition-colors cursor-pointer"
             onClick={() => router.push('/admin/ai-settings')}
           >
             <div className="text-center py-4">
@@ -231,7 +275,7 @@ const AdminDashboardPage: React.FC = () => {
           <AdminCard 
             title="SERP 분석" 
             description="검색엔진 성과를 분석합니다"
-            className="hover:shadow-md transition-shadow cursor-pointer"
+            className="hover:border-gray-300 transition-colors cursor-pointer"
             onClick={() => router.push('/admin/serp-analysis')}
           >
             <div className="text-center py-4">
@@ -242,13 +286,25 @@ const AdminDashboardPage: React.FC = () => {
           
           <AdminCard 
             title="댓글 관리" 
-            description="댓글을 관리합니다"
-            className="hover:shadow-md transition-shadow cursor-pointer"
+            description="새로운 댓글 시스템"
+            className="hover:border-gray-300 transition-colors cursor-pointer"
             onClick={() => router.push('/admin/comments')}
           >
             <div className="text-center py-4">
               <div className="text-3xl mb-2">💬</div>
-              <p className="text-sm text-gray-600">댓글 모더레이션</p>
+              <p className="text-sm text-gray-600">댓글 모더레이션 및 관리</p>
+            </div>
+          </AdminCard>
+
+          <AdminCard 
+            title="문의 관리" 
+            description="고객 문의를 관리합니다"
+            className="hover:border-gray-300 transition-colors cursor-pointer"
+            onClick={() => router.push('/admin/inquiries')}
+          >
+            <div className="text-center py-4">
+              <div className="text-3xl mb-2">📞</div>
+              <p className="text-sm text-gray-600">문의 상태 관리 및 답변</p>
             </div>
           </AdminCard>
         </AdminGrid>
@@ -256,7 +312,7 @@ const AdminDashboardPage: React.FC = () => {
 
       {/* 최근 활동 */}
       <AdminSection title="최근 활동">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* 인기 게시글 */}
           <AdminCard 
             title="인기 게시글 TOP5" 
@@ -306,7 +362,37 @@ const AdminDashboardPage: React.FC = () => {
                   href="/admin/comments" 
                   className="text-sm text-blue-600 hover:text-blue-800 font-medium"
                 >
-                  모든 댓글 보기 →
+                  댓글 관리 페이지 →
+                </Link>
+              </div>
+            </div>
+          </AdminCard>
+
+          {/* 최근 문의 */}
+          <AdminCard 
+            title="최근 문의" 
+            description="(최신순)"
+          >
+            <div className="space-y-2">
+              {dashboardData.recentInquiries?.slice(0, 5).map((inquiry) => (
+                <RecentItem
+                  key={inquiry.id}
+                  title={`${inquiry.name} - ${inquiry.serviceType}`}
+                  date={inquiry.date}
+                  author={`상태: ${
+                    inquiry.status === 'PENDING' ? '대기중' :
+                    inquiry.status === 'PROCESSING' ? '처리중' :
+                    inquiry.status === 'COMPLETED' ? '완료' : '취소'
+                  }`}
+                  link={`/admin/inquiries`}
+                />
+              ))}
+              <div className="pt-4 border-t border-gray-200">
+                <Link 
+                  href="/admin/inquiries" 
+                  className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                >
+                  모든 문의 보기 →
                 </Link>
               </div>
             </div>
