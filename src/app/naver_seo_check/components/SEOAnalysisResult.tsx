@@ -37,7 +37,7 @@ export function SEOAnalysisResult({ data, onReset }: SEOAnalysisResultProps) {
 
   // 통계 계산 (안전한 접근)
   const totalItems = data.categoryResults?.reduce((sum, cat) => sum + cat.checkResults.length, 0) || 0;
-  const passedItems = data.categoryResults?.reduce((sum, cat) => sum + cat.checkResults.filter(r => r.passed).length, 0) || 0;
+  const passedItems = data.categoryResults?.reduce((sum, cat) => sum + cat.checkResults.filter(r => r.status === 'pass').length, 0) || 0;
   const failedItems = totalItems - passedItems;
   const criticalIssues = data.improvements?.filter(imp => imp.priority === 'high').length || 0;
 
@@ -223,7 +223,7 @@ function CategoryCard({ categoryResult }: { categoryResult: CategoryResult }) {
     }
   };
 
-  const passedCount = categoryResult.checkResults.filter(r => r.passed).length;
+  const passedCount = categoryResult.checkResults.filter(r => r.status === 'pass').length;
   const totalCount = categoryResult.checkResults.length;
 
   return (
@@ -292,17 +292,17 @@ function CategoryDetailCard({ categoryResult }: { categoryResult: CategoryResult
           <div
             key={result.checkItemId}
             className={`flex items-center justify-between p-3 rounded-lg border ${
-              result.passed 
+              result.status === 'pass' 
                 ? 'bg-green-50 border-green-200' 
                 : 'bg-red-50 border-red-200'
             }`}
           >
             <div className="flex items-center space-x-3">
               <div className={`w-5 h-5 rounded-full flex items-center justify-center ${
-                result.passed ? 'bg-green-500' : 'bg-red-500'
+                result.status === 'pass' ? 'bg-green-500' : 'bg-red-500'
               }`}>
                 <span className="text-white text-xs">
-                  {result.passed ? '✓' : '✗'}
+                  {result.status === 'pass' ? '✓' : '✗'}
                 </span>
               </div>
               <div>

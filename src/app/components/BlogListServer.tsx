@@ -25,7 +25,7 @@ const BlogListServer: React.FC<BlogListServerProps> = ({ siteName, blogs }) => {
       <h1 className="text-3xl md:text-4xl font-extrabold text-center mb-10 tracking-tight">{siteName}</h1>
       
       {/* 태그 필터링을 위한 클라이언트 컴포넌트 */}
-      <FilteredBlogList blogs={blogs} />
+      <FilteredBlogList blogs={blogs} siteName={siteName} />
     </section>
   );
 };

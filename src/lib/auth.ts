@@ -81,7 +81,7 @@ export function getClientUserRole(): UserRole {
  */
 export function canAccessMenu(userRole: UserRole, requiredLevel: VisibilityLevel): boolean {
   const userLevel = PERMISSION_HIERARCHY[userRole];
-  const requiredLevelValue = PERMISSION_HIERARCHY[requiredLevel as UserRole];
+  const requiredLevelValue = PERMISSION_HIERARCHY[requiredLevel as unknown as UserRole];
   
   return userLevel >= requiredLevelValue;
 }

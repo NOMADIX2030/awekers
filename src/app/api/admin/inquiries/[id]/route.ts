@@ -12,7 +12,7 @@ function checkAdminAuth(req: NextRequest): boolean {
 // GET 요청 - 특정 문의 조회
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // 관리자 인증 체크
@@ -23,7 +23,8 @@ export async function GET(
       );
     }
 
-    const inquiryId = parseInt(params.id);
+    const { id } = await params;
+    const inquiryId = parseInt(id);
     
     const inquiry = await prisma.inquiry.findUnique({
       where: { id: inquiryId },
@@ -86,7 +87,7 @@ export async function GET(
 // PATCH 요청 - 문의 상태 및 답변 업데이트
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // 관리자 인증 체크
@@ -97,7 +98,8 @@ export async function PATCH(
       );
     }
 
-    const inquiryId = parseInt(params.id);
+    const { id } = await params;
+    const inquiryId = parseInt(id);
     const body = await request.json();
     const { status, adminResponse } = body;
 
@@ -157,7 +159,7 @@ export async function PATCH(
 // DELETE 요청 - 문의 삭제
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // 관리자 인증 체크
@@ -168,7 +170,8 @@ export async function DELETE(
       );
     }
 
-    const inquiryId = parseInt(params.id);
+    const { id } = await params;
+    const inquiryId = parseInt(id);
     
     // 문의 존재 확인
     const existingInquiry = await prisma.inquiry.findUnique({
@@ -202,7 +205,7 @@ export async function DELETE(
       }
     });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('문의 삭제 오류:', error);
     
     // 외래키 제약 조건 오류 처리

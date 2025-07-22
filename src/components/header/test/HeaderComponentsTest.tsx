@@ -98,7 +98,6 @@ export const HeaderComponentsTest: React.FC = () => {
           <div className="border-2 border-dashed border-gray-300 p-4 rounded">
             <HeaderNav 
               menuItems={testMenuItems}
-              userRole={UserRole.GUEST}
               isLoggedIn={isLoggedIn}
               onItemClick={handleNavClick}
             />
@@ -118,7 +117,6 @@ export const HeaderComponentsTest: React.FC = () => {
                 <HeaderBrand />
                 <HeaderNav 
                   menuItems={testMenuItems}
-                  userRole={UserRole.GUEST}
                   isLoggedIn={isLoggedIn}
                   onItemClick={handleNavClick}
                 />

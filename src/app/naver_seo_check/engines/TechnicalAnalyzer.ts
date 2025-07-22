@@ -27,6 +27,7 @@ export class TechnicalAnalyzer {
     return {
       id: 'https_ssl',
       name: '사이트 내 SSL(HTTPS) 보안 적용',
+      description: '웹사이트가 HTTPS 프로토콜을 사용하여 보안 연결을 제공하는지 확인합니다.',
       status: isHttps ? 'pass' : 'fail',
       score: isHttps ? 4 : 0,
       maxScore: 4,

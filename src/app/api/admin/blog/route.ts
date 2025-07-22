@@ -62,7 +62,7 @@ export async function GET(request: NextRequest) {
     ]);
 
     let partialCacheHits = 0;
-    let dbQueries = [];
+    const dbQueries = [];
 
     // 통계 데이터
     let blogStats = cachedStats;

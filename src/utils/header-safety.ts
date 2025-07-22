@@ -223,8 +223,8 @@ export class HeaderSafetyManager {
   private static async checkDatabaseConnection(): Promise<SafetyCheck> {
     try {
       // Prisma 클라이언트로 DB 연결 확인
-      const { prisma } = await import('@/lib/prisma');
-      await prisma.$queryRaw`SELECT 1`;
+      const prismaModule = await import('@/lib/prisma');
+      await prismaModule.default.$queryRaw`SELECT 1`;
       
       return {
         name: '데이터베이스 연결',

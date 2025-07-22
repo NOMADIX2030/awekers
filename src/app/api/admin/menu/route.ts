@@ -81,6 +81,8 @@ export async function GET() {
 
 // 메뉴 생성 (POST)
 export async function POST(request: NextRequest) {
+  const cache = CacheManager.getInstance();
+  
   try {
     const body = await request.json();
     const { label, href, order, isActive, visibilityLevel } = body;
@@ -112,6 +114,10 @@ export async function POST(request: NextRequest) {
       }
     });
 
+    // 🚀 캐시 무효화
+    await cache.invalidate('menu:list');
+    await cache.invalidate('menu:stats');
+
     return NextResponse.json({
       success: true,
       data: newMenu,
@@ -128,6 +134,8 @@ export async function POST(request: NextRequest) {
 
 // 메뉴 수정 (PUT)
 export async function PUT(request: NextRequest) {
+  const cache = CacheManager.getInstance();
+  
   try {
     const body = await request.json();
     const { id, label, href, order, isActive, visibilityLevel } = body;
@@ -151,6 +159,10 @@ export async function PUT(request: NextRequest) {
       }
     });
 
+    // 🚀 캐시 무효화
+    await cache.invalidate('menu:list');
+    await cache.invalidate('menu:stats');
+
     return NextResponse.json({
       success: true,
       data: updatedMenu,
@@ -167,6 +179,8 @@ export async function PUT(request: NextRequest) {
 
 // 메뉴 삭제 (DELETE)
 export async function DELETE(request: NextRequest) {
+  const cache = CacheManager.getInstance();
+  
   try {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
@@ -178,9 +192,22 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    await prisma.menu.delete({
-      where: { id: parseInt(id) }
+    // 🚀 관련 하위메뉴도 함께 삭제
+    await prisma.$transaction(async (tx) => {
+      // 먼저 관련 하위메뉴 삭제
+      await tx.subMenu.deleteMany({
+        where: { parentMenuId: parseInt(id) }
+      });
+      
+      // 그 다음 메뉴 삭제
+      await tx.menu.delete({
+        where: { id: parseInt(id) }
+      });
     });
+
+    // 🚀 캐시 무효화
+    await cache.invalidate('menu:list');
+    await cache.invalidate('menu:stats');
 
     return NextResponse.json({
       success: true,

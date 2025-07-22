@@ -1,6 +1,7 @@
 import React from "react";
 import prisma from "@/lib/prisma";
 import { Metadata } from "next";
+import Link from "next/link";
 import TagListClient from "./TagListClient";
 
 // SEO 메타데이터 동적 생성
@@ -49,7 +50,6 @@ export default async function TagPage({ params }: { params: Promise<{ tag: strin
     return (
       <div className="min-h-screen bg-gray-50">
         <TagListClient 
-          tag={decodedTag} 
           blogs={blogs} 
         />
       </div>
@@ -66,12 +66,12 @@ export default async function TagPage({ params }: { params: Promise<{ tag: strin
           <p className="text-gray-600 mb-8">
             잠시 후 다시 시도해주세요.
           </p>
-          <a 
+          <Link 
             href="/blog" 
             className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             블로그 목록으로 돌아가기
-          </a>
+          </Link>
         </div>
       </div>
     );

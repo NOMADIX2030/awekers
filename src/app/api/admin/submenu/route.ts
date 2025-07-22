@@ -1,11 +1,34 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { CacheManager } from '@/lib/admin/CacheManager';
+
+// 🎯 캐시 키 상수 정의
+const CACHE_KEYS = {
+  SUBMENU_LIST: 'submenu:list:all',
+  MENU_LIST: 'menu:list:all'
+};
 
 // 하위메뉴 목록 조회 (GET)
 export async function GET(request: NextRequest) {
+  const cache = CacheManager.getInstance();
+  
   try {
     const { searchParams } = new URL(request.url);
     const parentMenuId = searchParams.get('parentMenuId');
+
+    // 🚀 캐시 키 생성
+    const cacheKey = parentMenuId 
+      ? `submenu:list:parent:${parentMenuId}`
+      : CACHE_KEYS.SUBMENU_LIST;
+
+    // 🚀 캐시 확인
+    const cachedResult = await cache.get(cacheKey);
+    if (cachedResult) {
+      return NextResponse.json({
+        ...cachedResult,
+        cached: true
+      });
+    }
 
     let subMenus;
     
@@ -45,10 +68,15 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    return NextResponse.json({
+    const responseData = {
       success: true,
       data: subMenus
-    });
+    };
+
+    // 🚀 캐시 저장 (5분)
+    await cache.set(cacheKey, responseData, 300);
+
+    return NextResponse.json(responseData);
   } catch (error) {
     console.error('하위메뉴 조회 오류:', error);
     return NextResponse.json(
@@ -60,6 +88,8 @@ export async function GET(request: NextRequest) {
 
 // 하위메뉴 생성 (POST)
 export async function POST(request: NextRequest) {
+  const cache = CacheManager.getInstance();
+  
   try {
     const body = await request.json();
     const { parentMenuId, label, href, icon, order, isActive, visibilityLevel } = body;
@@ -114,6 +144,10 @@ export async function POST(request: NextRequest) {
       }
     });
 
+    // 🚀 캐시 무효화
+    await cache.invalidate('submenu:list');
+    await cache.invalidate('menu:list');
+
     return NextResponse.json({
       success: true,
       data: newSubMenu,
@@ -130,9 +164,11 @@ export async function POST(request: NextRequest) {
 
 // 하위메뉴 수정 (PUT)
 export async function PUT(request: NextRequest) {
+  const cache = CacheManager.getInstance();
+  
   try {
     const body = await request.json();
-    const { id, parentMenuId, label, href, icon, order, isActive } = body;
+    const { id, parentMenuId, label, href, icon, order, isActive, visibilityLevel } = body;
 
     // 입력값 검증
     if (!id || !parentMenuId || !label || !href) {
@@ -150,7 +186,8 @@ export async function PUT(request: NextRequest) {
         href,
         icon: icon || null,
         order: order || 0,
-        isActive: isActive !== undefined ? isActive : true
+        isActive: isActive !== undefined ? isActive : true,
+        visibilityLevel: visibilityLevel || 'GUEST'
       },
       include: {
         parentMenu: {
@@ -161,6 +198,10 @@ export async function PUT(request: NextRequest) {
         }
       }
     });
+
+    // 🚀 캐시 무효화
+    await cache.invalidate('submenu:list');
+    await cache.invalidate('menu:list');
 
     return NextResponse.json({
       success: true,
@@ -178,6 +219,8 @@ export async function PUT(request: NextRequest) {
 
 // 하위메뉴 삭제 (DELETE)
 export async function DELETE(request: NextRequest) {
+  const cache = CacheManager.getInstance();
+  
   try {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
@@ -192,6 +235,10 @@ export async function DELETE(request: NextRequest) {
     await prisma.subMenu.delete({
       where: { id: parseInt(id) }
     });
+
+    // 🚀 캐시 무효화
+    await cache.invalidate('submenu:list');
+    await cache.invalidate('menu:list');
 
     return NextResponse.json({
       success: true,

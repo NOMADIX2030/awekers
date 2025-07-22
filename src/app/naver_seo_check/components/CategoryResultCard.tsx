@@ -12,6 +12,11 @@ interface CategoryResultCardProps {
 export function CategoryResultCard({ data, detailed = false }: CategoryResultCardProps) {
   const [isExpanded, setIsExpanded] = useState(detailed);
 
+  // 카테고리 정보가 없을 때를 대비한 기본값 설정
+  const categoryColor = (data as any).category?.color || '#888';
+  const categoryName = (data as any).category?.name || data.categoryId;
+  const categoryDescription = (data as any).category?.description || '카테고리 정보';
+
   const getStatusIcon = (status: SEOCheckResult['status']) => {
     switch (status) {
       case 'pass':
@@ -69,14 +74,14 @@ export function CategoryResultCard({ data, detailed = false }: CategoryResultCar
   return (
     <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
       {/* 카테고리 헤더 */}
-      <div className="p-6 border-b border-gray-100 category-card-border" style={{ borderLeftColor: data.category.color }}>
+      <div className="p-6 border-b border-gray-100 category-card-border" style={{ borderLeftColor: categoryColor }}>
         <div className="flex items-center justify-between mb-4">
           <div className="flex-1">
             <h3 className="text-lg font-bold text-gray-900 mb-1">
-              {data.category.name}
+              {categoryName}
             </h3>
             <p className="text-sm text-gray-600">
-              {data.category.description}
+              {categoryDescription}
             </p>
           </div>
           
@@ -94,7 +99,7 @@ export function CategoryResultCard({ data, detailed = false }: CategoryResultCar
         <div className="mb-4">
           <div className="flex justify-between items-center mb-2">
             <span className="text-sm font-medium text-gray-700">달성률</span>
-            <span className="text-sm font-medium category-text-color" style={{ color: data.category.color }}>
+            <span className="text-sm font-medium category-text-color" style={{ color: categoryColor }}>
               {Math.round(data.percentage)}%
             </span>
           </div>
@@ -103,7 +108,7 @@ export function CategoryResultCard({ data, detailed = false }: CategoryResultCar
               className="h-2 rounded-full transition-all duration-300"
               style={{ 
                 width: `${data.percentage}%`,
-                backgroundColor: data.category.color
+                backgroundColor: categoryColor
               }}
             ></div>
           </div>
@@ -113,25 +118,25 @@ export function CategoryResultCard({ data, detailed = false }: CategoryResultCar
         <div className="grid grid-cols-4 gap-4 text-center">
           <div>
             <div className="text-lg font-bold text-green-600">
-              {data.items.filter(item => item.status === 'pass').length}
+              {data.checkResults.filter(item => item.status === 'pass').length}
             </div>
             <div className="text-xs text-gray-500">통과</div>
           </div>
           <div>
             <div className="text-lg font-bold text-red-600">
-              {data.items.filter(item => item.status === 'fail').length}
+              {data.checkResults.filter(item => item.status === 'fail').length}
             </div>
             <div className="text-xs text-gray-500">실패</div>
           </div>
           <div>
             <div className="text-lg font-bold text-yellow-600">
-              {data.items.filter(item => item.status === 'warning').length}
+              {data.checkResults.filter(item => item.status === 'warning').length}
             </div>
             <div className="text-xs text-gray-500">주의</div>
           </div>
           <div>
             <div className="text-lg font-bold text-blue-600">
-              {data.items.filter(item => item.status === 'info').length}
+              {data.checkResults.filter(item => item.status === 'info').length}
             </div>
             <div className="text-xs text-gray-500">정보</div>
           </div>
@@ -160,8 +165,8 @@ export function CategoryResultCard({ data, detailed = false }: CategoryResultCar
       {isExpanded && (
         <div className="p-6">
           <div className="space-y-4">
-            {data.items.map((item) => (
-              <div key={item.id} className="border border-gray-200 rounded-lg p-4">
+            {data.checkResults.map((item) => (
+              <div key={item.checkItemId} className="border border-gray-200 rounded-lg p-4">
                 <div className="flex items-start">
                   <div className="mr-3 mt-0.5">
                     {getStatusIcon(item.status)}
@@ -170,10 +175,9 @@ export function CategoryResultCard({ data, detailed = false }: CategoryResultCar
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between mb-2">
                       <h4 className="font-medium text-gray-900 text-sm">
-                        {item.name}
+                        {item.checkItemId}
                       </h4>
                       <div className="flex items-center space-x-2">
-                        {getPriorityBadge(item.priority)}
                         <span className={`text-sm font-medium ${getStatusColor(item.status)}`}>
                           {item.score}/{item.maxScore}점
                         </span>
@@ -186,21 +190,7 @@ export function CategoryResultCard({ data, detailed = false }: CategoryResultCar
 
                     {item.details && (
                       <div className="text-xs text-gray-500 mb-2 bg-gray-50 p-2 rounded">
-                        {item.details}
-                      </div>
-                    )}
-
-                    {item.solution && item.status !== 'pass' && (
-                      <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                        <div className="flex items-start">
-                          <svg className="w-4 h-4 text-blue-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                          </svg>
-                          <div>
-                            <h5 className="text-sm font-medium text-blue-900 mb-1">개선 방안</h5>
-                            <p className="text-sm text-blue-700">{item.solution}</p>
-                          </div>
-                        </div>
+                        {JSON.stringify(item.details)}
                       </div>
                     )}
                   </div>

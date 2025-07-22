@@ -277,7 +277,10 @@ const SEOAnalysisResult: React.FC<SEOAnalysisResultProps> = ({
                 score={data.mobile.score}
                 description="반응형 디자인, 모바일 사용성"
               >
-                <MobileOptimizationSection data={data.mobile} />
+                {/* <MobileOptimizationSection data={data.mobile} /> */}
+                <div className="text-center py-8 text-gray-500">
+                  모바일 최적화 분석 기능이 일시적으로 비활성화되었습니다.
+                </div>
               </ScoreCard>
             </div>
           </div>

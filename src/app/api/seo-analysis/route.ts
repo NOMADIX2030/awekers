@@ -141,10 +141,10 @@ function analyzeStructuredData(html: string): any {
           
           // 오류 및 경고 추가
           if (schemaAnalysis.errors.length > 0) {
-            errors.push(...schemaAnalysis.errors.map(e => `${schemaType}: ${e}`));
+            errors.push(...schemaAnalysis.errors.map((e: any) => `${schemaType}: ${e}`));
           }
           if (schemaAnalysis.warnings.length > 0) {
-            warnings.push(...schemaAnalysis.warnings.map(w => `${schemaType}: ${w}`));
+            warnings.push(...schemaAnalysis.warnings.map((w: any) => `${schemaType}: ${w}`));
           }
         }
       } catch (e) {

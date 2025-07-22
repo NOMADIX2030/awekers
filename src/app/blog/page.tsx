@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
 import { Metadata } from "next";
+import Link from "next/link";
 import BlogPageList from "../components/BlogPageList";
 import awekers from "@/lib/logger";
 import { getSiteUrl } from "@/utils/domain";
@@ -78,7 +79,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 // 정적 생성 최적화
 export const revalidate = 300; // 5분마다 재생성
-export const dynamic = 'force-static';
+export const dynamic = 'force-dynamic'; // 동적 렌더링으로 변경
 
 export default async function BlogPage() {
   const perf = awekers.performance.start('blogPage');
@@ -131,12 +132,12 @@ export default async function BlogPage() {
           <p className="text-gray-600 mb-8">
             잠시 후 다시 시도해주세요.
           </p>
-          <a 
+          <Link 
             href="/" 
             className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             홈으로 돌아가기
-          </a>
+          </Link>
         </div>
       </div>
     );

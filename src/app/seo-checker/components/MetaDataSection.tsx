@@ -49,7 +49,7 @@ const MetaDataSection: React.FC<MetaDataSectionProps> = ({ data }) => {
         {data.title.exists && data.title.content && (
           <>
             <p className="text-sm text-gray-700 mb-2 line-clamp-2">
-              "{data.title.content}"
+              &quot;{data.title.content}&quot;
             </p>
             <div className="flex justify-between text-xs">
               <span className={getLengthColor(data.title.length, data.title.maxLength)}>
@@ -70,7 +70,7 @@ const MetaDataSection: React.FC<MetaDataSectionProps> = ({ data }) => {
         {data.description.exists && data.description.content && (
           <>
             <p className="text-sm text-gray-700 mb-2 line-clamp-3">
-              "{data.description.content}"
+              &quot;{data.description.content}&quot;
             </p>
             <div className="flex justify-between text-xs">
               <span className={getLengthColor(data.description.length, data.description.maxLength)}>

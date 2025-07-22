@@ -31,13 +31,15 @@ export interface CrawledData {
   crawledAt: Date;
 }
 
-// 개별 검사 결과
+// 개별 검사 결과 (SEOCheckResult와 일치하도록 수정)
 export interface CheckResult {
   checkItemId: string;
-  passed: boolean;
+  status: 'pass' | 'fail' | 'warning' | 'info';
   score: number;
   maxScore: number;
   message: string;
+  priority: 'high' | 'medium' | 'low';
+  solution?: string;
   details?: any;
 }
 
@@ -125,8 +127,8 @@ export interface CrawledPageData {
 export interface SEOCheckResult {
   id: string;
   name: string;
-  description: string;
-  status: 'pass' | 'fail' | 'warning';
+  description?: string;
+  status: 'pass' | 'fail' | 'warning' | 'info';
   score: number;
   maxScore: number;
   message: string;

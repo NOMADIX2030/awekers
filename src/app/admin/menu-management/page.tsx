@@ -275,11 +275,12 @@ const MenuManagementPage = () => {
 
   // 메뉴 삭제
   const handleDeleteMenu = async (id: number) => {
-    if (!confirm('정말로 이 메뉴를 삭제하시겠습니까?')) {
+    if (!confirm('정말로 이 메뉴를 삭제하시겠습니까?\n\n⚠️ 관련된 모든 하위메뉴도 함께 삭제됩니다.')) {
       return;
     }
 
     try {
+      setFormLoading(true);
       const response = await fetch(`/api/admin/menu?id=${id}`, {
         method: 'DELETE'
       });
@@ -288,13 +289,16 @@ const MenuManagementPage = () => {
 
       if (data.success) {
         setMessage({ type: 'success', text: data.message });
-        fetchMenus();
+        await fetchMenus();
+        await fetchSubMenus(); // 하위메뉴도 새로고침
       } else {
         setMessage({ type: 'error', text: data.error || '삭제에 실패했습니다.' });
       }
     } catch (error) {
       console.error('메뉴 삭제 오류:', error);
       setMessage({ type: 'error', text: '메뉴 삭제 중 오류가 발생했습니다.' });
+    } finally {
+      setFormLoading(false);
     }
   };
 
@@ -383,6 +387,7 @@ const MenuManagementPage = () => {
     }
 
     try {
+      setFormLoading(true);
       const response = await fetch(`/api/admin/submenu?id=${id}`, {
         method: 'DELETE'
       });
@@ -391,7 +396,7 @@ const MenuManagementPage = () => {
 
       if (data.success) {
         setMessage({ type: 'success', text: data.message });
-        fetchSubMenus();
+        await fetchSubMenus();
         refreshHeaderMenu();
       } else {
         setMessage({ type: 'error', text: data.error || '삭제에 실패했습니다.' });
@@ -399,6 +404,8 @@ const MenuManagementPage = () => {
     } catch (error) {
       console.error('하위메뉴 삭제 오류:', error);
       setMessage({ type: 'error', text: '하위메뉴 삭제 중 오류가 발생했습니다.' });
+    } finally {
+      setFormLoading(false);
     }
   };
 

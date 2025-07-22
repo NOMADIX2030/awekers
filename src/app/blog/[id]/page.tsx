@@ -5,12 +5,13 @@ import BlogDetailClient from './BlogDetailClient';
 import './styles.css';
 
 interface BlogPageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export async function generateMetadata({ params }: BlogPageProps): Promise<Metadata> {
   try {
-    const blogId = parseInt(params.id);
+    const { id } = await params;
+    const blogId = parseInt(id);
     if (isNaN(blogId)) {
       return {
         title: '블로그를 찾을 수 없습니다 - AWEKERS',
@@ -67,7 +68,8 @@ export async function generateMetadata({ params }: BlogPageProps): Promise<Metad
 
 export default async function BlogPage({ params }: BlogPageProps) {
   try {
-    const blogId = parseInt(params.id);
+    const { id } = await params;
+    const blogId = parseInt(id);
     if (isNaN(blogId)) {
       notFound();
     }
@@ -90,12 +92,46 @@ export default async function BlogPage({ params }: BlogPageProps) {
       notFound();
     }
 
+    // 댓글 데이터 가져오기
+    const rawComments = await prisma.comment.findMany({
+      where: { 
+        blogId: blogId,
+        isHidden: false 
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            isAdmin: true
+          }
+        },
+        _count: {
+          select: {
+            likes: true,
+            reports: true
+          }
+        }
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    });
+
+    // 타입 변환
+    const comments = rawComments.map(comment => ({
+      ...comment,
+      createdAt: comment.createdAt.toISOString(),
+      updatedAt: comment.updatedAt.toISOString()
+    }));
+
     // 관리자 권한 체크 (간단한 방식)
     const isAdmin = false; // 실제로는 세션에서 확인해야 함
 
     return (
       <BlogDetailClient 
         blog={blog} 
+        comments={comments}
         isAdmin={isAdmin}
       />
     );

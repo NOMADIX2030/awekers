@@ -245,7 +245,7 @@ export default function InquiryCheckPage() {
                 <div className="mt-2 p-3 bg-amber-50 border border-amber-200 rounded-md">
                   <p className="text-sm text-amber-700">
                     💡 <strong>참조번호를 모르시나요?</strong><br/>
-                    문의 접수 시 발송된 이메일을 확인하거나, "이메일만으로 검색"을 선택해보세요.<br/>
+                    문의 접수 시 발송된 이메일을 확인하거나, &quot;이메일만으로 검색&quot;을 선택해보세요.<br/>
                     <strong>참조번호 예시:</strong> AWE-2025-123456 또는 숫자 ID (123)
                   </p>
                 </div>

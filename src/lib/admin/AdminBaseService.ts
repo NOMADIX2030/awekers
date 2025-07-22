@@ -73,7 +73,7 @@ export class AdminBaseService {
       const queryResults = await this.queryOptimizer.executeParallel(config.queries);
 
       // 🎯 데이터 변환
-      let responseData = queryResults;
+      let responseData: any = queryResults;
       if (config.transform) {
         responseData = config.transform(queryResults);
       }
@@ -154,7 +154,7 @@ export class AdminBaseService {
       }
 
       // 🎯 데이터 변환
-      let responseData = result;
+      let responseData: any = result;
       if (config.transform) {
         responseData = config.transform(result);
       }

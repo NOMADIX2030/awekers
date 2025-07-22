@@ -265,7 +265,7 @@ export default function AIDatabasePage() {
                     </div>
                     <div className="p-4 bg-gray-50 rounded-lg">
                       <div className="text-sm font-medium text-gray-700 mb-2">🔎 자연어 쿼리 → SQL 변환</div>
-                      <div className="text-xs text-gray-600">"최근 매출이 높은 상품은?" → 자동 SQL 생성</div>
+                      <div className="text-xs text-gray-600">&quot;최근 매출이 높은 상품은?&quot; → 자동 SQL 생성</div>
                     </div>
                     <div className="p-4 bg-gray-50 rounded-lg">
                       <div className="text-sm font-medium text-gray-700 mb-2">🔁 주기적 요약 메일 발송</div>
@@ -291,7 +291,7 @@ export default function AIDatabasePage() {
                     </div>
                     <div className="mt-4 p-3 bg-cyan-100 rounded-lg">
                       <div className="text-xs text-cyan-800 font-medium">🤖 AI 요약</div>
-                      <div className="text-xs text-cyan-700 mt-1">"이탈률이 평소보다 높아졌습니다. 고객 만족도 조사를 권장합니다."</div>
+                      <div className="text-xs text-cyan-700 mt-1">&quot;이탈률이 평소보다 높아졌습니다. 고객 만족도 조사를 권장합니다.&quot;</div>
                     </div>
                   </div>
                 </div>
@@ -903,7 +903,7 @@ export default function AIDatabasePage() {
                 <div>
                   <h3 className="text-xl font-bold text-gray-900 mb-3">자연어 처리</h3>
                   <p className="text-gray-600 leading-relaxed">
-                    복잡한 SQL 없이 "이번 달 매출이 높은 상품은?"과 같은 자연어로 데이터를 조회할 수 있습니다.
+                    복잡한 SQL 없이 &quot;이번 달 매출이 높은 상품은?&quot;과 같은 자연어로 데이터를 조회할 수 있습니다.
                   </p>
                 </div>
               </div>

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { updateProgress, resetProgress } from "./progress/route";
+import { updateProgress, resetProgress } from "@/lib/progress-manager";
 
 // 🎯 모델별 토큰 한도 정의
 const MODEL_TOKEN_LIMITS: Record<string, number> = {

@@ -47,7 +47,8 @@ export class WebCrawler {
         loadTime,
         size,
         robotsTxt,
-        sitemapXml
+        sitemapXml,
+        crawledAt: new Date()
       };
 
     } catch (error) {

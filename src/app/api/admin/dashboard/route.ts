@@ -72,7 +72,7 @@ export async function GET(request: NextRequest) {
     ]);
 
     let partialCacheHits = 0;
-    let dbQueries = [];
+    const dbQueries = [];
 
     // 🚀 Phase 3: 누락된 데이터만 선택적 조회 (Database Selective Loading)
     

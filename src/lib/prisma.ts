@@ -136,9 +136,7 @@ if (process.env.NODE_ENV === 'production') {
   // 연결 풀 상태 모니터링 (메트릭이 지원되는 경우에만)
   setInterval(() => {
     try {
-      // @ts-ignore
-      if (prisma.$metrics) {
-        // @ts-ignore
+      if ((prisma as any).$metrics) {
         const metrics = (prisma as any).$metrics.json();
         const activeConnections = metrics?.counters?.find((c: any) => c.key === 'prisma_pool_connections_open')?.value || 0;
         

@@ -21,16 +21,16 @@ const createReportHTML = (data: SEOAnalysisResult): string => {
 
   // 통계 계산
   const totalItems = data.categoryResults?.reduce((sum, cat) => sum + cat.checkResults.length, 0) || 0;
-  const passedItems = data.categoryResults?.reduce((sum, cat) => sum + cat.checkResults.filter(r => r.passed).length, 0) || 0;
+  const passedItems = data.categoryResults?.reduce((sum, cat) => sum + cat.checkResults.filter(r => r.status === 'pass').length, 0) || 0;
   const failedItems = totalItems - passedItems;
   const criticalIssues = data.improvements?.filter(imp => imp.priority === 'high').length || 0;
 
   // 개별 검사 결과 렌더링 함수
   const renderCheckResults = (checkResults: CheckResult[]) => {
     return checkResults.map(result => {
-      const statusIcon = result.passed ? '✅' : '❌';
-      const statusClass = result.passed ? 'status-pass' : 'status-fail';
-      const statusText = result.passed ? '통과' : '실패';
+      const statusIcon = result.status === 'pass' ? '✅' : '❌';
+      const statusClass = result.status === 'pass' ? 'status-pass' : 'status-fail';
+      const statusText = result.status === 'pass' ? '통과' : '실패';
       
       return `
         <div class="check-item">
