@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.2] - 2025-07-22
+
+### Added
+- 새로운 기능들
+
+### Changed
+- 기존 기능 변경사항
+
+### Fixed
+- 버그 수정사항
+
+## [0.3.1]
+
 ### Added
 - 새로운 기능들 (개발 중)
 
