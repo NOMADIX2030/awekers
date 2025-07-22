@@ -2,29 +2,13 @@ import prisma from "@/lib/prisma";
 import { Metadata } from "next";
 import BlogPageList from "../components/BlogPageList";
 import awekers from "@/lib/logger";
-
-// 🎯 동적 도메인 감지 함수
-function getCurrentDomain(): string {
-  if (process.env.NEXT_PUBLIC_SITE_URL) {
-    return process.env.NEXT_PUBLIC_SITE_URL;
-  }
-  
-  if (process.env.VERCEL_URL) {
-    return `https://${process.env.VERCEL_URL}`;
-  }
-  
-  if (process.env.NODE_ENV === 'production') {
-    return 'https://awekers.vercel.app';
-  }
-  
-  return 'http://localhost:3000';
-}
+import { getSiteUrl } from "@/utils/domain";
 
 // SEO 메타데이터 생성
 export async function generateMetadata(): Promise<Metadata> {
   const perf = awekers.performance.start('blogPageMetadata');
   
-  const currentDomain = getCurrentDomain();
+  const currentDomain = getSiteUrl();
   const metadataBase = new URL(currentDomain);
   
   try {

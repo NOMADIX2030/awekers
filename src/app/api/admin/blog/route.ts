@@ -221,6 +221,112 @@ export async function GET(request: NextRequest) {
   }
 }
 
+// 🚀 블로그 생성/수정 API
+export async function POST(request: NextRequest) {
+  const startTime = performance.now();
+  const cache = CacheManager.getInstance();
+  
+  try {
+    // 관리자 권한 확인
+    const authHeader = request.headers.get('Authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer admin-key')) {
+      return NextResponse.json(
+        { success: false, message: '관리자 권한이 필요합니다.' },
+        { status: 401 }
+      );
+    }
+
+    const body = await request.json();
+    const { title, summary, content, tag, image, id } = body;
+
+    // 필수 필드 검증
+    if (!title || !summary || !content) {
+      return NextResponse.json(
+        { success: false, message: '제목, 요약, 내용은 필수입니다.' },
+        { status: 400 }
+      );
+    }
+
+    let result;
+    
+    if (id) {
+      // 블로그 수정
+      result = await prisma.blog.update({
+        where: { id: parseInt(id) },
+        data: {
+          title,
+          summary,
+          content,
+          tag: tag || '',
+          image: image || ''
+        },
+        select: {
+          id: true,
+          title: true,
+          summary: true,
+          date: true,
+          view: true,
+          tag: true,
+          image: true
+        }
+      });
+    } else {
+      // 새 블로그 생성
+      result = await prisma.blog.create({
+        data: {
+          title,
+          summary,
+          content,
+          tag: tag || '',
+          image: image || '',
+          date: new Date(),
+          view: 0
+        },
+        select: {
+          id: true,
+          title: true,
+          summary: true,
+          date: true,
+          view: true,
+          tag: true,
+          image: true
+        }
+      });
+    }
+
+    // 🚀 관련 캐시 무효화
+    await cache.invalidate('blog:');
+
+    const responseTime = (performance.now() - startTime).toFixed(2);
+    console.log(`🎯 블로그 ${id ? '수정' : '생성'} 완료: ${responseTime}ms`);
+
+    return NextResponse.json({
+      success: true,
+      message: `블로그가 성공적으로 ${id ? '수정' : '생성'}되었습니다.`,
+      data: {
+        ...result,
+        date: result.date.toISOString().split('T')[0],
+        tags: result.tag.split(',').map((t: string) => t.trim()).filter(Boolean)
+      },
+      responseTime: `${responseTime}ms`
+    });
+
+  } catch (error) {
+    const responseTime = (performance.now() - startTime).toFixed(2);
+    console.error('❌ 블로그 저장 오류:', error);
+    console.error(`⚠️ 블로그 저장 실패: ${responseTime}ms`);
+    
+    return NextResponse.json(
+      { 
+        success: false, 
+        message: '블로그 저장 중 오류가 발생했습니다.',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      },
+      { status: 500 }
+    );
+  }
+}
+
 // 🚀 최적화된 블로그 삭제 API
 export async function DELETE(request: NextRequest) {
   const startTime = performance.now();

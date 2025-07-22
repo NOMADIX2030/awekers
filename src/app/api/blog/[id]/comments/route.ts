@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { QueryOptimizer } from '@/lib/admin/QueryOptimizer';
 
 // 댓글 조회 (GET)
 export async function GET(
@@ -17,43 +18,47 @@ export async function GET(
       );
     }
 
-    // 블로그 존재 확인
-    const blog = await prisma.blog.findUnique({
-      where: { id: blogId }
+    // 🚀 QueryOptimizer를 사용한 성능 최적화
+    const optimizer = QueryOptimizer.getInstance();
+    
+    // 블로그 존재 확인과 댓글 조회를 병렬로 실행
+    const results = await optimizer.executeParallel({
+      blog: () => prisma.blog.findUnique({
+        where: { id: blogId },
+        select: { id: true, title: true }
+      }),
+      comments: () => prisma.comment.findMany({
+        where: { 
+          blogId,
+          isHidden: false // 숨겨진 댓글 제외
+        },
+        include: {
+          user: {
+            select: {
+              id: true,
+              email: true,
+              isAdmin: true
+            }
+          },
+          _count: {
+            select: {
+              likes: true,
+              reports: true
+            }
+          }
+        },
+        orderBy: { createdAt: 'desc' }
+      })
     });
 
-    if (!blog) {
+    if (!results.blog) {
       return NextResponse.json(
         { error: '존재하지 않는 블로그입니다.' },
         { status: 404 }
       );
     }
 
-    // 댓글 조회 (좋아요 수, 신고 수 포함)
-    const comments = await prisma.comment.findMany({
-      where: { 
-        blogId,
-        isHidden: false // 숨겨진 댓글 제외
-      },
-      include: {
-        user: {
-          select: {
-            id: true,
-            email: true,
-            isAdmin: true
-          }
-        },
-        _count: {
-          select: {
-            likes: true,
-            reports: true
-          }
-        }
-      },
-      orderBy: { createdAt: 'desc' }
-    });
-
-    return NextResponse.json({ comments });
+    return NextResponse.json({ comments: results.comments });
 
   } catch (error) {
     console.error('댓글 조회 오류:', error);
@@ -97,24 +102,29 @@ export async function POST(
       );
     }
 
-    // 블로그 존재 확인
-    const blog = await prisma.blog.findUnique({
-      where: { id: blogId }
+    // 🚀 QueryOptimizer를 사용한 성능 최적화
+    const optimizer = QueryOptimizer.getInstance();
+    
+    // 블로그와 사용자 존재 확인을 병렬로 실행
+    const validations = await optimizer.executeParallel({
+      blog: () => prisma.blog.findUnique({
+        where: { id: blogId },
+        select: { id: true }
+      }),
+      user: () => prisma.user.findUnique({
+        where: { id: userId },
+        select: { id: true, email: true, isAdmin: true }
+      })
     });
 
-    if (!blog) {
+    if (!validations.blog) {
       return NextResponse.json(
         { error: '존재하지 않는 블로그입니다.' },
         { status: 404 }
       );
     }
 
-    // 사용자 존재 확인
-    const user = await prisma.user.findUnique({
-      where: { id: userId }
-    });
-
-    if (!user) {
+    if (!validations.user) {
       return NextResponse.json(
         { error: '올바르지 않은 사용자입니다.' },
         { status: 400 }

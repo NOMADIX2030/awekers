@@ -1,0 +1,91 @@
+{
+  "backupInfo": {
+    "timestamp": "2025-07-22T17:31:26+09:00",
+    "version": "0.3.1",
+    "environment": "development",
+    "backupType": "blog-detail-page",
+    "createdBy": "AI Assistant",
+    "purpose": "디자인 변경 전 안전한 복구 지점 확보"
+  },
+  "files": {
+    "page.tsx": {
+      "size": 7625,
+      "type": "server-component",
+      "description": "서버 컴포넌트 - SEO 메타데이터 생성, 성능 모니터링, 에러 핸들링"
+    },
+    "BlogDetailClient.tsx": {
+      "size": 17768,
+      "type": "client-component",
+      "description": "클라이언트 컴포넌트 - 마크다운 렌더링, 관리자 편집, 태그 자동 링크"
+    },
+    "styles.css": {
+      "size": 7865,
+      "type": "stylesheet",
+      "description": "마크다운 스타일링, 반응형 디자인, 타이포그래피 최적화"
+    }
+  },
+  "features": {
+    "seo": [
+      "Open Graph 메타태그",
+      "Twitter Card 메타태그",
+      "구조화 데이터 (JSON-LD)",
+      "정규 URL 설정",
+      "키워드 자동 링크"
+    ],
+    "performance": [
+      "정적 생성 (revalidate: 3600초)",
+      "성능 모니터링 시스템",
+      "중복 쿼리 방지",
+      "캐시 최적화"
+    ],
+    "userExperience": [
+      "반응형 디자인",
+      "마크다운 완전 지원",
+      "관리자 실시간 편집",
+      "태그 자동 링크 생성",
+      "댓글 시스템"
+    ]
+  },
+  "performanceMetrics": {
+    "pageLoad": "~178ms",
+    "metadataGeneration": "~145ms",
+    "cacheHit": "0.05ms",
+    "responsive": "모든 화면 크기 지원"
+  },
+  "techStack": {
+    "framework": "Next.js 15",
+    "router": "App Router",
+    "react": "React 18",
+    "components": "Server/Client Components",
+    "language": "TypeScript",
+    "database": "Prisma ORM",
+    "markdown": "ReactMarkdown",
+    "styling": "Tailwind CSS"
+  },
+  "restoreCommands": {
+    "fullRestore": "cp -r backups/blog-detail-backup-20250722_173126/* \"src/app/blog/[id]/\"",
+    "individualFiles": {
+      "page": "cp backups/blog-detail-backup-20250722_173126/page.tsx \"src/app/blog/[id]/\"",
+      "client": "cp backups/blog-detail-backup-20250722_173126/BlogDetailClient.tsx \"src/app/blog/[id]/\"",
+      "styles": "cp backups/blog-detail-backup-20250722_173126/styles.css \"src/app/blog/[id]/\""
+    }
+  },
+  "dependencies": {
+    "required": [
+      "react-markdown",
+      "remark-gfm",
+      "remark-breaks",
+      "remark-toc",
+      "rehype-slug",
+      "rehype-autolink-headings"
+    ],
+    "optional": [
+      "next",
+      "react",
+      "typescript",
+      "prisma",
+      "tailwindcss"
+    ]
+  },
+  "notes": "이 백업은 블로그 상세페이지의 완전한 기능과 디자인을 포함합니다. 복구 시 서버 재시작이 필요합니다."
+} 

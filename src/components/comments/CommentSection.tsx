@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import CommentForm from './CommentForm';
 import CommentItem from './CommentItem';
 import ReportModal from './ReportModal';
@@ -8,9 +8,10 @@ import { Comment, CommentAPIResponse, LikeResponse } from '@/types/comment';
 
 interface CommentSectionProps {
   blogId: number;
+  initialComments?: Comment[];
 }
 
-const CommentSection: React.FC<CommentSectionProps> = ({ blogId }) => {
+const CommentSection: React.FC<CommentSectionProps> = ({ blogId, initialComments = [] }) => {
   // 상태 관리
   const [comments, setComments] = useState<Comment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -30,6 +31,9 @@ const CommentSection: React.FC<CommentSectionProps> = ({ blogId }) => {
   // 신고 모달
   const [showReportModal, setShowReportModal] = useState(false);
   const [selectedCommentId, setSelectedCommentId] = useState<number | null>(null);
+  
+  // 로딩 상태 추적
+  const hasLoadedRef = useRef(false);
 
   // 사용자 정보 초기화
   useEffect(() => {
@@ -46,8 +50,8 @@ const CommentSection: React.FC<CommentSectionProps> = ({ blogId }) => {
     }
   }, []);
 
-  // 댓글 목록 로드
-  const loadComments = async () => {
+  // 댓글 목록 로드 (수동 새로고침용)
+  const loadComments = useCallback(async () => {
     try {
       setIsLoading(true);
       setError('');
@@ -60,9 +64,6 @@ const CommentSection: React.FC<CommentSectionProps> = ({ blogId }) => {
       }
       
       setComments(data.comments || []);
-      
-      // 사용자의 좋아요/신고 상태도 로드할 수 있지만, 
-      // 현재는 간단히 하기 위해 빈 상태로 시작
       setLikedComments(new Set());
       setReportedComments(new Set());
       
@@ -72,12 +73,48 @@ const CommentSection: React.FC<CommentSectionProps> = ({ blogId }) => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [blogId]);
 
   // 초기 댓글 로드
   useEffect(() => {
-    loadComments();
-  }, [blogId]);
+    // 이미 로드되었으면 다시 로드하지 않음
+    if (hasLoadedRef.current) return;
+    
+    if (initialComments && initialComments.length > 0) {
+      // 서버에서 미리 가져온 댓글 사용
+      setComments(initialComments);
+      setIsLoading(false);
+      hasLoadedRef.current = true;
+    } else if (blogId) {
+      // 클라이언트에서 댓글 로드 (fallback)
+      const fetchComments = async () => {
+        try {
+          setIsLoading(true);
+          setError('');
+          
+          const response = await fetch(`/api/blog/${blogId}/comments`);
+          const data: CommentAPIResponse = await response.json();
+          
+          if (!response.ok) {
+            throw new Error('댓글을 불러오지 못했습니다.');
+          }
+          
+          setComments(data.comments || []);
+          setLikedComments(new Set());
+          setReportedComments(new Set());
+          
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : '댓글을 불러오는데 실패했습니다.';
+          setError(errorMessage);
+        } finally {
+          setIsLoading(false);
+          hasLoadedRef.current = true;
+        }
+      };
+      
+      fetchComments();
+    }
+  }, [blogId, initialComments]);
 
   // 메시지 자동 숨김
   useEffect(() => {

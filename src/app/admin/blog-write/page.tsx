@@ -27,6 +27,32 @@ const AdminBlogWritePage: React.FC = () => {
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState("");
   const [aiSuccess, setAiSuccess] = useState("");
+  const [aiMode, setAiMode] = useState<'step-by-step' | 'single'>('step-by-step');
+  const [aiProgress, setAiProgress] = useState<string>("");
+  const [tokenUsage, setTokenUsage] = useState<{
+    promptTokens: number;
+    completionTokens: number;
+    totalTokens: number;
+    estimatedCost: string;
+  } | null>(null);
+  
+  // 🎯 단계별 진행상황 추적
+  interface ProgressStep {
+    id: string;
+    title: string;
+    status: 'pending' | 'in-progress' | 'completed' | 'error';
+    message?: string;
+  }
+  
+  const [progressSteps, setProgressSteps] = useState<ProgressStep[]>([
+    { id: 'outline', title: '블로그 아웃라인 생성', status: 'pending' },
+    { id: 'section1', title: '섹션 1 생성', status: 'pending' },
+    { id: 'section2', title: '섹션 2 생성', status: 'pending' },
+    { id: 'section3', title: '섹션 3 생성', status: 'pending' },
+    { id: 'section4', title: '섹션 4 생성', status: 'pending' },
+    { id: 'section5', title: '섹션 5 생성', status: 'pending' },
+    { id: 'combine', title: '전체 내용 조합', status: 'pending' }
+  ]);
 
   // Unsplash 이미지 후보 상태
   const [unsplashImages, setUnsplashImages] = useState<string[]>([]);
@@ -93,25 +119,56 @@ const AdminBlogWritePage: React.FC = () => {
     }
   }, [imageValid]);
 
+  // 🎯 진행상황 업데이트 함수
+  const updateProgress = (stepId: string, status: 'pending' | 'in-progress' | 'completed' | 'error', message?: string) => {
+    setProgressSteps(prev => prev.map(step => 
+      step.id === stepId 
+        ? { ...step, status, message }
+        : step
+    ));
+  };
+
+  // 🎯 진행상황 초기화 함수
+  const resetProgress = () => {
+    setProgressSteps(prev => prev.map(step => ({ ...step, status: 'pending', message: undefined })));
+  };
+
   // 모든 필드가 채워져 있고 이미지가 유효한지 체크
   const isFormValid = title.trim() && summary.trim() && content.trim() && tag.trim() && image.trim() && isValidImageUrl(image) && imageValid;
 
   // 저장
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isFormValid) return;
+    
     setSaving(true);
     setError("");
     try {
-      const res = await fetch("/api/blog", {
+      const res = await fetch("/api/admin/blog", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, summary, content, tag, image }),
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": "Bearer admin-key"
+        },
+        body: JSON.stringify({
+          title: title.trim(),
+          summary: summary.trim(),
+          content: content.trim(),
+          tag: tag.trim(),
+          image: image.trim(),
+        }),
       });
-      if (!res.ok) throw new Error("저장에 실패했습니다.");
-      const newBlog = await res.json();
-      router.push(`/blog/${newBlog.id}`);
+      
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || "블로그 저장에 실패했습니다.");
+      }
+      
+      const data = await res.json();
+      alert("블로그가 성공적으로 저장되었습니다!");
+      router.push(`/blog/${data.data.id}`);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "알 수 없는 오류");
+      setError(e instanceof Error ? e.message : "알 수 없는 오류가 발생했습니다.");
     } finally {
       setSaving(false);
     }
@@ -122,12 +179,71 @@ const AdminBlogWritePage: React.FC = () => {
     setAiLoading(true);
     setAiError("");
     setAiSuccess("");
+    setAiProgress("");
+    setTokenUsage(null); // 토큰 사용량 정보 초기화
+    
+    // 진행상황 초기화
+    resetProgress();
+    
+    // SSE 연결 설정
+    let eventSource: EventSource | null = null;
+    
+    if (aiMode === 'step-by-step') {
+      try {
+        eventSource = new EventSource('/api/ai-blog/progress');
+        
+        eventSource.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            
+            if (data.type === 'progress') {
+              // 개별 진행상황 업데이트
+              updateProgress(data.data.stepId, data.data.status, data.data.message);
+            } else if (data.type === 'reset') {
+              // 진행상황 초기화
+              resetProgress();
+            } else if (data.type === 'init') {
+              // 초기 진행상황 설정
+              data.data.forEach((progress: any) => {
+                updateProgress(progress.stepId, progress.status, progress.message);
+              });
+            }
+          } catch (error) {
+            console.error('SSE 데이터 파싱 오류:', error);
+          }
+        };
+        
+        eventSource.onerror = (error) => {
+          console.error('SSE 연결 오류:', error);
+        };
+      } catch (error) {
+        console.error('SSE 연결 실패:', error);
+      }
+    }
+    
     try {
-      const res = await fetch("/api/ai-blog", {
+      // 단계별 생성 모드에 따른 진행 상황 표시
+      if (aiMode === 'step-by-step') {
+        setAiProgress("📋 1단계: 블로그 아웃라인 생성 중...");
+        updateProgress('outline', 'in-progress', '아웃라인 생성 중...');
+      }
+      
+      // 🎯 AI API 호출
+      const aiPromise = fetch("/api/ai-blog", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: aiPrompt }),
+        body: JSON.stringify({ 
+          prompt: aiPrompt,
+          mode: aiMode 
+        }),
       });
+      
+      // 🎯 AI API 응답 대기
+      const startTime = Date.now();
+      const res = await aiPromise;
+      const totalTime = Date.now() - startTime;
+      
+      console.log(`⏱️ AI API 응답 완료: ${totalTime}ms`);
       
       const data = await res.json();
       
@@ -151,7 +267,17 @@ const AdminBlogWritePage: React.FC = () => {
         setContent(data.content || "");
         setTag(data.tag || "");
         setImage(data.image || "");
-        setAiSuccess("AI 블로그 생성이 완료되었습니다! 내용을 확인하고 필요시 수정해주세요.");
+        
+        // 토큰 사용량 정보 저장
+        if (data.tokenUsage) {
+          setTokenUsage(data.tokenUsage);
+        }
+        
+        const successMessage = aiMode === 'step-by-step' 
+          ? "🚀 단계별 AI 블로그 생성이 완료되었습니다! 각 섹션이 상세하게 작성되었습니다."
+          : "AI 블로그 생성이 완료되었습니다! 내용을 확인하고 필요시 수정해주세요.";
+        
+        setAiSuccess(successMessage);
         setAiError(""); // 성공 메시지가 있으면 에러 메시지 제거
       }
     } catch (e) {
@@ -163,6 +289,12 @@ const AdminBlogWritePage: React.FC = () => {
       setAiSuccess(""); // 에러가 있으면 성공 메시지 제거
     } finally {
       setAiLoading(false);
+      setAiProgress("");
+      
+      // SSE 연결 정리
+      if (eventSource) {
+        eventSource.close();
+      }
     }
   };
 
@@ -185,6 +317,151 @@ const AdminBlogWritePage: React.FC = () => {
             <div className="w-2 h-2 bg-purple-600 rounded-full"></div>
             <h2 className="text-lg sm:text-xl font-semibold text-gray-900">AI 블로그 생성</h2>
           </div>
+          
+          {/* AI 생성 모드 선택 */}
+          <div className="flex flex-col sm:flex-row gap-4 p-4 bg-purple-50 rounded-lg border border-purple-200">
+            
+            {/* 🎯 진행상황 표시 (단계별 모드일 때만) */}
+            {aiMode === 'step-by-step' && aiLoading && (
+              <div className="w-full mb-4">
+                <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-lg border border-purple-200 p-6 shadow-sm">
+                  <h3 className="text-lg font-semibold text-purple-800 mb-4 flex items-center">
+                    <div className="w-3 h-3 bg-purple-600 rounded-full mr-3 animate-pulse"></div>
+                    🤖 AI 블로그 생성 진행상황
+                  </h3>
+                  <div className="space-y-3">
+                    {progressSteps.map((step, index) => (
+                      <div key={step.id} className={`flex items-center space-x-4 p-3 rounded-lg transition-all duration-300 ${
+                        step.status === 'completed' ? 'bg-green-50 border border-green-200' :
+                        step.status === 'in-progress' ? 'bg-purple-50 border border-purple-200 shadow-sm' :
+                        step.status === 'error' ? 'bg-red-50 border border-red-200' :
+                        'bg-gray-50 border border-gray-200'
+                      }`}>
+                        {/* 상태 아이콘 */}
+                        <div className="flex-shrink-0">
+                          {step.status === 'pending' && (
+                            <div className="w-6 h-6 border-2 border-gray-300 rounded-full"></div>
+                          )}
+                          {step.status === 'in-progress' && (
+                            <div className="w-6 h-6 border-2 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+                          )}
+                          {step.status === 'completed' && (
+                            <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center animate-bounce">
+                              <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                              </svg>
+                            </div>
+                          )}
+                          {step.status === 'error' && (
+                            <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center">
+                              <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                              </svg>
+                            </div>
+                          )}
+                        </div>
+                        
+                        {/* 진행상황 텍스트 */}
+                        <div className="flex-1">
+                          <div className={`text-sm font-semibold ${
+                            step.status === 'completed' ? 'text-green-700' :
+                            step.status === 'in-progress' ? 'text-purple-700' :
+                            step.status === 'error' ? 'text-red-700' :
+                            'text-gray-500'
+                          }`}>
+                            {step.title}
+                          </div>
+                          {step.message && (
+                            <div className="text-xs text-gray-600 mt-1 flex items-center">
+                              <span className="w-2 h-2 bg-purple-400 rounded-full mr-2 animate-pulse"></span>
+                              {step.message}
+                            </div>
+                          )}
+                        </div>
+                        
+                        {/* 진행률 표시 */}
+                        <div className="flex-shrink-0">
+                          {step.status === 'in-progress' && (
+                            <div className="w-20 h-2 bg-gray-200 rounded-full overflow-hidden">
+                              <div className="h-full bg-gradient-to-r from-purple-500 to-purple-600 rounded-full animate-pulse" style={{ width: '70%' }}></div>
+                            </div>
+                          )}
+                          {step.status === 'completed' && (
+                            <div className="text-xs text-green-600 font-medium">완료</div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {/* 전체 진행률 */}
+                  <div className="mt-6 pt-4 border-t border-purple-200">
+                    <div className="flex justify-between items-center mb-3">
+                      <span className="text-sm font-semibold text-purple-800">전체 진행률</span>
+                      <span className="text-sm font-bold text-purple-600">
+                        {progressSteps.filter(s => s.status === 'completed').length}/{progressSteps.length}
+                      </span>
+                    </div>
+                    <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden shadow-inner">
+                      <div 
+                        className="h-full bg-gradient-to-r from-purple-500 via-purple-600 to-blue-500 rounded-full transition-all duration-700 ease-out shadow-sm"
+                        style={{ 
+                          width: `${(progressSteps.filter(s => s.status === 'completed').length / progressSteps.length) * 100}%` 
+                        }}
+                      ></div>
+                    </div>
+                    <div className="mt-2 text-xs text-gray-500 text-center">
+                      {progressSteps.filter(s => s.status === 'completed').length === progressSteps.length 
+                        ? '🎉 모든 단계가 완료되었습니다!' 
+                        : 'AI가 열심히 블로그를 생성하고 있습니다...'}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-purple-800 mb-2">
+                생성 모드 선택
+              </label>
+              <div className="flex gap-3">
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="aiMode"
+                    value="step-by-step"
+                    checked={aiMode === 'step-by-step'}
+                    onChange={(e) => setAiMode(e.target.value as 'step-by-step' | 'single')}
+                    className="mr-2 text-purple-600 focus:ring-purple-500"
+                    disabled={aiLoading || saving}
+                  />
+                  <span className="text-sm text-purple-700">
+                    🚀 단계별 생성 (권장)
+                  </span>
+                </label>
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="aiMode"
+                    value="single"
+                    checked={aiMode === 'single'}
+                    onChange={(e) => setAiMode(e.target.value as 'step-by-step' | 'single')}
+                    className="mr-2 text-purple-600 focus:ring-purple-500"
+                    disabled={aiLoading || saving}
+                  />
+                  <span className="text-sm text-purple-700">
+                    ⚡ 단일 생성
+                  </span>
+                </label>
+              </div>
+              <p className="text-xs text-purple-600 mt-1">
+                {aiMode === 'step-by-step' 
+                  ? "각 섹션을 독립적으로 생성하여 더 상세하고 구조화된 긴 글을 작성합니다."
+                  : "한 번에 전체 내용을 생성합니다. (토큰 한계로 인해 짧을 수 있음)"
+                }
+              </p>
+            </div>
+          </div>
+          
           <div className="flex flex-col sm:flex-row gap-3">
             <input
               className="flex-1 px-4 py-3 rounded-lg border border-gray-300 bg-gray-50 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 outline-none transition"
@@ -203,10 +480,52 @@ const AdminBlogWritePage: React.FC = () => {
             </button>
           </div>
           
+          {/* AI 진행 상황 표시 */}
+          {aiProgress && (
+            <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-sm text-blue-700 font-medium">{aiProgress}</p>
+            </div>
+          )}
+          
           {/* AI 성공 메시지 */}
           {aiSuccess && (
             <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
               <p className="text-sm text-green-700 font-medium">{aiSuccess}</p>
+              
+              {/* 토큰 사용량 정보 */}
+              {tokenUsage && (
+                <div className="mt-3 pt-3 border-t border-green-200">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
+                      <svg className="w-2 h-2 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <span className="text-sm font-semibold text-blue-700">💰 토큰 사용량 정보</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 text-xs">
+                    <div className="bg-blue-50 p-2 rounded border border-blue-200">
+                      <div className="text-blue-600 font-medium">프롬프트 토큰</div>
+                      <div className="text-blue-800 font-bold">{tokenUsage.promptTokens.toLocaleString()}</div>
+                    </div>
+                    <div className="bg-green-50 p-2 rounded border border-green-200">
+                      <div className="text-green-600 font-medium">완성 토큰</div>
+                      <div className="text-green-800 font-bold">{tokenUsage.completionTokens.toLocaleString()}</div>
+                    </div>
+                    <div className="bg-purple-50 p-2 rounded border border-purple-200">
+                      <div className="text-purple-600 font-medium">총 토큰</div>
+                      <div className="text-purple-800 font-bold">{tokenUsage.totalTokens.toLocaleString()}</div>
+                    </div>
+                    <div className="bg-orange-50 p-2 rounded border border-orange-200">
+                      <div className="text-orange-600 font-medium">예상 비용</div>
+                      <div className="text-orange-800 font-bold">{tokenUsage.estimatedCost}</div>
+                    </div>
+                  </div>
+                  <div className="mt-2 text-xs text-gray-600">
+                    💡 토큰 사용량은 AI 모델의 처리 복잡도와 생성된 내용의 길이에 따라 달라집니다.
+                  </div>
+                </div>
+              )}
             </div>
           )}
           
